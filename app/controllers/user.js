@@ -66,15 +66,6 @@ router.route('/')
                 if (err) {
                     return res.status(400).json({success: false, message: err.message})
                 }
-                Activity.create({
-                    owner: req.user._id,
-                    link: config.domain + "/users/" + user._id,
-                    message: req.user.firstName + " Added new User"
-                }, (err) => {
-                    if (err) {
-                        return res.status(400).json({success: false, message: err.message})
-                    }
-                });
                 res.json({success: true, message: "User Added Successfully"})
             });
         });
@@ -84,43 +75,6 @@ router.route('/')
 router.route('/:userId')
     .get((req, res, next) => {
         let query = User.findOne({_id: req.params.userId});
-        if (req.query !== {}) {
-            let qps = req.query;
-            for (let q in qps) {
-                if (q === 'fields') {
-                    if (qps.fields !== 'all') {
-                        let fields = qps.fields.split(',')
-                        query = query.select(fields);
-                    }
-                }
-
-                if (q === 'with') {
-                    switch (qps.with) {
-                        case 'friends':
-                            query = query.populate('friends');
-                            break;
-                        case 'groups':
-                            query = query.populate('groups');
-                            break;
-                        case 'owned_groups':
-                            query = query.populate('owned_groups');
-                            break;
-                        case 'orders':
-                            query = query.populate('orders');
-                            break;
-                        case 'notifications':
-                            query = query.populate('notifications');
-                            break;
-                        case 'activities':
-                            query = query.populate('activities');
-                            break;
-                        case 'all':
-                            query = query.populate('notifications orders groups friends owned_groups activities');
-                            break;
-                    }
-                }
-            }
-        }
         query.exec((err, user) => {
             if (err) {
                 return res.status(500).json({
@@ -144,15 +98,6 @@ router.route('/:userId')
             if (err) {
                 return res.status(500).json({success: false, message: err})
             }
-            Activity.create({
-                owner: req.user._id,
-                link: config.domain + "/users/" + req.user._id,
-                message: req.user.firstName + " Updated his Info"
-            }, (err) => {
-                if (err) {
-                    return res.status(400).json({success: false, message: err.message})
-                }
-            })
             res.json({success: true, message: "User Updated Successfully"})
         });
     })
@@ -175,40 +120,6 @@ router.route('/:userId')
             res.json({success: true, message: "User Deleted Successfully"})
         })
     });
-
-router.get('/:userId/friends', (req, res, next) => {
-    User.findOne({_id: req.params.userId}).populate({
-        path: 'friends',
-        select: 'firstName lastName image email role',
-        options: {sort: '-createdAt'}
-    }).exec((err, user) => {
-        if (err) {
-            return res.status(500).json({success: false, message: err})
-        }
-        if(!user){
-            return res.status(404).json({success: false, message: "User Not found"})
-        }
-        res.json(user.friends);
-    })
-});
-router.get('/:userId/activities', (req, res, next) => {
-    User.findOne({_id: req.params.userId}).populate({
-        path: 'activities',
-        options: {sort: '-createdAt'}
-    }).exec((err, user) => {
-        if (err) {
-            return res.status(500).json({success: false, message: err})
-        }
-        if(!user){
-            return res.status(404).json({success: false, message: "User Not found"})
-        }
-        res.json(user.activities);
-    })
-});
-
-router.get('/:userId/messages', (req, res, next) => {
-
-});
 router.get('/:userId/notifications', (req, res, next) => {
     User.findOne({_id: req.params.userId}).populate({
         path: 'notifications',

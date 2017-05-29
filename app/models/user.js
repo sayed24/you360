@@ -49,23 +49,7 @@ const UserSchema = new Schema({
 //= ===============================
 // User ORM Methods
 //= ===============================
-UserSchema.methods.friendWith = function friendWith(userId) {
-    this.model('User').findOne({_id: userId}, (err, user) => {
-        user.friends.addToSet(this._id);
-        user.save();
-    });
-    this.friends.addToSet(userId);
-    this.save();
-};
 
-UserSchema.methods.unfriendWith = function unfriendWith(userId) {
-    this.model('User').findOne({_id: userId}, (err, user) => {
-        user.friends.pull(this._id);
-        user.save();
-    });
-    this.friends.pull(userId);
-    this.save();
-};
 UserSchema.methods.notifyFor = function notifyFor(notification) {
     notification.to = this._id
     this.model('Notification').create(notification, (err) => {
@@ -75,14 +59,6 @@ UserSchema.methods.notifyFor = function notifyFor(notification) {
     });
 };
 
-UserSchema.methods.makeOrder = function makeOrder(order) {
-    order.owner = this._id
-    this.model('Order').create(order, (err) => {
-        if (err) {
-            console.log(err);
-        }
-    });
-};
 // Pre-save of user to database, hash password if password is modified or new
 UserSchema.pre('save', function (next) {
     const user = this,
@@ -127,35 +103,10 @@ UserSchema.methods.comparePassword = function (candidatePassword, cb) {
 //= ===============================
 // User ORM Virtuals
 //= ===============================
-UserSchema.virtual('orders', {
-    ref: 'Order', // The model to use
-    localField: '_id', // Find people where `localField`
-    foreignField: 'owner' // is equal to `foreignField`
-});
-
 UserSchema.virtual('notifications', {
     ref: 'Notification', // The model to use
     localField: '_id', // Find people where `localField`
     foreignField: 'to' // is equal to `foreignField`
 });
-UserSchema.virtual('activities', {
-    ref: 'Activity', // The model to use
-    localField: '_id', // Find people where `localField`
-    foreignField: 'owner' // is equal to `foreignField`
-});
-UserSchema.virtual('joined_orders', {
-    ref: 'Order', // The model to use
-    localField: '_id', // Find people where `localField`
-    foreignField: 'joined' // is equal to `foreignField`
-});
-UserSchema.virtual('joined_groups', {
-    ref: 'Group', // The model to use
-    localField: '_id', // Find people where `localField`
-    foreignField: 'joined' // is equal to `foreignField`
-});
-UserSchema.virtual('owned_groups', {
-    ref: 'Group', // The model to use
-    localField: '_id', // Find people where `localField`
-    foreignField: 'owner' // is equal to `foreignField`
-});
+
 mongoose.model('User', UserSchema);
