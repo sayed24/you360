@@ -25,8 +25,6 @@ const UserSchema = new Schema({
         firstName: {type: String},
         lastName: {type: String},
         image: {type: String, default: CONSTANTS.PROFILE_IMAGE},
-        groups: [{type: Schema.ObjectId, ref: 'Group'}],
-        friends: [{type: Schema.ObjectId, ref: 'User'}],
         role: {
             type: String,
             enum: [CONSTANTS.ROLE_MEMBER, CONSTANTS.ROLE_CLIENT, CONSTANTS.ROLE_OWNER, CONSTANTS.ROLE_ADMIN],

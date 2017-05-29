@@ -2,9 +2,9 @@ const ROLE_MEMBER = 'Member';
 const ROLE_CLIENT = 'Client';
 const ROLE_OWNER = 'Owner';
 const ROLE_ADMIN = 'Admin';
-const PROFILE_IMAGE = 'https://yalabenanotlob.herokuapp.com/img/profile.png';
-const PROVIDER_IMAGE = 'https://yalabenanotlob.herokuapp.com/img/profile.png';
-const ITEM_IMAGE = 'https://yalabenanotlob.herokuapp.com/img/profile.png';
+const PROFILE_IMAGE = '';
+const PROVIDER_IMAGE = '';
+const ITEM_IMAGE = '';
 module.exports = {
     ROLE_MEMBER,
     ROLE_CLIENT,
