@@ -16,7 +16,7 @@ module.exports = function (app, config) {
     // app.set('views', config.root + '/app/views');
     // app.set('view engine', 'ejs');
     // Enable CORS from client-side
-    app.use(cors({origin:'https://yallabena-d9673.firebaseapp.com'}));
+    app.use(cors({origin:'http://localhost:4200'}));
     app.use(express.static(config.root + '/public'));
     app.use(cookieParser());
     app.use(bodyParser.json({limit: '50mb'}));
