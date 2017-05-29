@@ -19,7 +19,7 @@ router.route('/')
     .get((req, res, next) => {
         User.find({}).sort('-createdAt').exec((err, users) => {
             if (err) {
-                res.status(500).json({
+                res.status(422).json({
                     success: false,
                     message: err.message
                 });
@@ -55,7 +55,7 @@ router.route('/')
         });
         req.getValidationResult().then(function (result) {
             if (!result.isEmpty()) {
-                res.status(400).json(result.useFirstErrorOnly().mapped());
+                res.status(422).json(result.useFirstErrorOnly().mapped());
                 return;
             }
             let user = req.body;
@@ -64,7 +64,7 @@ router.route('/')
             }
             User.create(user, (err, user) => {
                 if (err) {
-                    return res.status(400).json({success: false, message: err.message})
+                    return res.status(422).json({success: false, message: err.message})
                 }
                 res.json({success: true, message: "User Added Successfully"})
             });
@@ -77,7 +77,7 @@ router.route('/:userId')
         let query = User.findOne({_id: req.params.userId});
         query.exec((err, user) => {
             if (err) {
-                return res.status(500).json({
+                return res.status(422).json({
                     success: false,
                     message: err.message
                 });
@@ -96,7 +96,7 @@ router.route('/:userId')
         }
         User.update({_id: req.params.userId}, {"$set": userdata}, (err) => {
             if (err) {
-                return res.status(500).json({success: false, message: err})
+                return res.status(422).json({success: false, message: err})
             }
             res.json({success: true, message: "User Updated Successfully"})
         });
@@ -104,7 +104,7 @@ router.route('/:userId')
     .delete((req, res, next) => {
         User.findOne({_id: req.params.userId}, (err, user) => {
             if (err) {
-                return res.status(500).json({success: false, message: err})
+                return res.status(422).json({success: false, message: err})
             }
             if(!user){
                 return res.status(404).json({success: false, message: "User Not found"})
@@ -126,7 +126,7 @@ router.get('/:userId/notifications', (req, res, next) => {
         options: {sort: '-createdAt'}
     }).exec((err, user) => {
         if (err) {
-            return res.status(500).json({success: false, message: err})
+            return res.status(422).json({success: false, message: err})
         }
         if(!user){
             return res.status(404).json({success: false, message: "User Not found"})

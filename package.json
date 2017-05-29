@@ -1,7 +1,7 @@
 {
-  "name": "yalaBenaServer",
+  "name": "you360Server",
   "version": "1.0.0",
-  "description": "API server for food ordering system, powered by Express.",
+  "description": "API server for 360 video.",
   "main": "index.js",
   "scripts": {
     "test": "mocha -S --ui bdd --require ./tests/spec_helper.js --recursive ./tests --reporter spec",
