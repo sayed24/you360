@@ -1,0 +1,29 @@
+//Orders
+-- > POST { "name": "name", "for": "Diner or Lunch or BreakFast" }-- > /orders optional invited=['usersId','userId]
+-- > POST { "email": "email" } or { "user": "user id" }-- > /:orderId/invite
+-- > POST { "item": "item id", "amount": "amount" }-- - > /:orderId/add_item
+-- > POST { "item": "order item id" }-- - > /:orderId/remove_item
+
+
+///to accept or cancel or leave
+-- > POST-- > /:orderId/join --> accept the invitation
+-- > POST-- > /:orderId/cancel --> cancel the invitation
+-- > POST-- > /:orderId/leave --> leave the order after joining
+
+//notification logic
+after login -->:
+        socket.emit('login',user);   //please send user with id
+        //to listen for any new notifications
+        socket.on('refresh notifications', function(notification){
+          //handle the notification
+          //notification object {_id,to,link,icon,message,details,seen}
+         })
+//to notify a user
+        socket.emit('new notification',{to:'UserId',link:"actionLink",message:"message"}); // optional you can send (details or icon) with the object
+//make the mark notification as seen
+        socket.emit('see notification',notificationId);
+
+//friends activities
+-->GET /users/:userId/friends/activities --> get the friend with activities
+//get user activities
+/users/:userId?with=activities

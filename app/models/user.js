@@ -1,0 +1,163 @@
+// Importing Node packages required for schema
+const mongoose = require('mongoose');
+const bcrypt = require('bcrypt-nodejs');
+const CONSTANTS = require('../constants');
+const Schema = mongoose.Schema;
+
+//= ===============================
+// User Schema
+//= ===============================
+const UserSchema = new Schema({
+        email: {
+            type: String,
+            lowercase: true,
+            unique: true,
+            required: true
+        },
+        password: {
+            type: String,
+            required: true
+        },
+        online: {
+            type: Boolean,
+            default: false
+        },
+        firstName: {type: String},
+        lastName: {type: String},
+        image: {type: String, default: CONSTANTS.PROFILE_IMAGE},
+        groups: [{type: Schema.ObjectId, ref: 'Group'}],
+        friends: [{type: Schema.ObjectId, ref: 'User'}],
+        role: {
+            type: String,
+            enum: [CONSTANTS.ROLE_MEMBER, CONSTANTS.ROLE_CLIENT, CONSTANTS.ROLE_OWNER, CONSTANTS.ROLE_ADMIN],
+            default: CONSTANTS.ROLE_MEMBER
+        },
+        stripe: {
+            customerId: {type: String},
+            subscriptionId: {type: String},
+            lastFour: {type: String},
+            plan: {type: String},
+            activeUntil: {type: Date}
+        },
+        resetPasswordToken: {type: String},
+        resetPasswordExpires: {type: Date}
+    },
+    {
+        toJSON: {virtuals: true},
+        timestamps: true,
+    });
+
+
+//= ===============================
+// User ORM Methods
+//= ===============================
+UserSchema.methods.friendWith = function friendWith(userId) {
+    this.model('User').findOne({_id: userId}, (err, user) => {
+        user.friends.addToSet(this._id);
+        user.save();
+    });
+    this.friends.addToSet(userId);
+    this.save();
+};
+
+UserSchema.methods.unfriendWith = function unfriendWith(userId) {
+    this.model('User').findOne({_id: userId}, (err, user) => {
+        user.friends.pull(this._id);
+        user.save();
+    });
+    this.friends.pull(userId);
+    this.save();
+};
+UserSchema.methods.notifyFor = function notifyFor(notification) {
+    notification.to = this._id
+    this.model('Notification').create(notification, (err) => {
+        if (err) {
+            console.log(err);
+        }
+    });
+};
+
+UserSchema.methods.makeOrder = function makeOrder(order) {
+    order.owner = this._id
+    this.model('Order').create(order, (err) => {
+        if (err) {
+            console.log(err);
+        }
+    });
+};
+// Pre-save of user to database, hash password if password is modified or new
+UserSchema.pre('save', function (next) {
+    const user = this,
+        SALT_FACTOR = 5;
+    if (!user.isModified('password')) return next();
+    bcrypt.genSalt(SALT_FACTOR, (err, salt) => {
+        if (err) return next(err);
+        bcrypt.hash(user.password, salt, null, (err, hash) => {
+            if (err) return next(err);
+            user.password = hash;
+            next();
+        });
+    });
+});
+UserSchema.pre('remove', (next) => {
+    // Remove all related docs
+    this.model('Notification').remove({to: this._id}, (err) => {
+        if (err) {
+            console.log(err);
+        }
+    });
+    this.model('User').find({_id: {"$in": this.friends}}, (err, users) => {
+        if (err) {
+            console.log(err);
+        }
+        users.forEach((user) => {
+            user.unfriendWith(this._id);
+        });
+    });
+
+});
+// Method to compare password for login
+UserSchema.methods.comparePassword = function (candidatePassword, cb) {
+    bcrypt.compare(candidatePassword, this.password, (err, isMatch) => {
+        if (err) {
+            return cb(err);
+        }
+        cb(null, isMatch);
+    });
+};
+
+//= ===============================
+// User ORM Virtuals
+//= ===============================
+UserSchema.virtual('orders', {
+    ref: 'Order', // The model to use
+    localField: '_id', // Find people where `localField`
+    foreignField: 'owner' // is equal to `foreignField`
+});
+
+UserSchema.virtual('notifications', {
+    ref: 'Notification', // The model to use
+    localField: '_id', // Find people where `localField`
+    foreignField: 'to' // is equal to `foreignField`
+});
+UserSchema.virtual('activities', {
+    ref: 'Activity', // The model to use
+    localField: '_id', // Find people where `localField`
+    foreignField: 'owner' // is equal to `foreignField`
+});
+UserSchema.virtual('joined_orders', {
+    ref: 'Order', // The model to use
+    localField: '_id', // Find people where `localField`
+    foreignField: 'joined' // is equal to `foreignField`
+});
+UserSchema.virtual('joined_groups', {
+    ref: 'Group', // The model to use
+    localField: '_id', // Find people where `localField`
+    foreignField: 'joined' // is equal to `foreignField`
+});
+UserSchema.virtual('owned_groups', {
+    ref: 'Group', // The model to use
+    localField: '_id', // Find people where `localField`
+    foreignField: 'owner' // is equal to `foreignField`
+});
+mongoose.model('User', UserSchema);
