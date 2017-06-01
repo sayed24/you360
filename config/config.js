@@ -55,7 +55,7 @@ const config = {
         domain: 'http://localhost:3000',
         secret: '~!@#$%salama^&*()',
         port: process.env.PORT || 3000,
-        db: process.env.MONGO_URI||'mongodb://heroku_99lglvmp:rhd69ifq0p4pe3mjbm8mv81iv3@ds155411.mlab.com:55411/heroku_99lglvmp',
+        db: process.env.MONGODB_URI||'mongodb://heroku_99lglvmp:rhd69ifq0p4pe3mjbm8mv81iv3@ds155411.mlab.com:55411/heroku_99lglvmp',
         sendgridApiKey: process.env.SEND_GRID,
         stripeApiKey: process.env.STRIP,
     }
