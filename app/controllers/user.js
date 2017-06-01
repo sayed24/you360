@@ -5,10 +5,19 @@ const router = require('express').Router(),
     config = require('../../config/config'),
     User = require('mongoose').model('User');
 const requireAuth = passport.authenticate('jwt', {session: false});
+/*
+* pagination
+*/
+const mongoosePaginate = require('mongoose-paginate');
+const paginate = require('express-paginate')
+
+router.use(paginate.middleware(10, 50));
+
 
 module.exports = function (app) {
 
     app.use('/api/users', router);
+    
 };
 router.use(requireAuth);
 
@@ -17,15 +26,18 @@ router.use(requireAuth);
 //= =======================================
 router.route('/')
     .get((req, res, next) => {
-        User.find({}).sort('-createdAt').exec((err, users) => {
+        User.paginate({}, { page: req.query.page, limit: req.query.limit }, function(err, users) {
             if (err) {
                 res.status(500).json({
                     success: false,
                     message: err.message
                 });
             }
+            console.log(req.user)
             res.json(users);
-        });
+           });
+        //})
+
     })
     .post((req, res, next) => {
         req.checkBody({
