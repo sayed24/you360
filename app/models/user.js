@@ -83,9 +83,8 @@ UserSchema.pre('save', function (next) {
 UserSchema.pre('remove', function (next) {
     // Remove all related docs
     this.model('Notification').remove({to: this._id}, (err) => {
-        if (err) {
-            console.log(err);
-        }
+        if (err) return next(err);
+        next();
     });
 });
 // Method to compare password for login
