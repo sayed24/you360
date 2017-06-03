@@ -169,7 +169,7 @@ router.route('/:videoId')
         });
     })
 
-    //Delete video
+    //Delete video 
     .delete((req, res, next) => {
         Video.findOne({_id: req.params.videoId}, (err, video) => {
             if (err) {
@@ -185,6 +185,18 @@ router.route('/:videoId')
                 res.json({success: true, message: "Video Deleted Successfully"})
             });
         })
+
+    })
+    //Update video info
+    .put((req, res, next) =>{
+        //update name,description,cat,tag
+        let videoinfo = req.body;
+        Video.update({_id: req.params.videoId}, {"$set": videoinfo}, (err) => {
+            if (err) {
+                return res.status(422).json({success: false, message: err})
+            }
+            res.json({success: true, message: "Video Updated Successfully"})
+        });
     });
 //TODO Add play video link in gui
 
