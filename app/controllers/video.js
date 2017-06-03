@@ -1,15 +1,15 @@
 const router = require('express').Router(),
-    passport = require('passport'),
-    fs = require('fs'),
-    url = require("url"),
-    path = require("path"),
-    uuid = require('uuid');
-    helpers = require('../helpers'),
-    config = require('../../config/config'),
-    User = require('mongoose').model('User');
-    Video = require('mongoose').model('Video');
-    Category =  require('mongoose').model('Category');
-    Tag = require('mongoose').model('Tag');
+passport = require('passport'),
+fs = require('fs'),
+url = require("url"),
+path = require("path"),
+uuid = require('uuid');
+helpers = require('../helpers'),
+config = require('../../config/config'),
+User = require('mongoose').model('User');
+Video = require('mongoose').model('Video');
+Category =  require('mongoose').model('Category');
+Tag = require('mongoose').model('Tag');
 
 const requireAuth = passport.authenticate('jwt', {session: false});
 

@@ -1,7 +1,8 @@
 // Importing Node packages required for schema
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-
+// pagination
+const mongoosePaginate = require('mongoose-paginate');
 //= ===============================
 // Video Schema
 //= ===============================
@@ -44,5 +45,9 @@ const VideoSchema = new Schema({
 // User ORM Virtuals
 //= ===============================
 
+/*
+ * pagination
+*/
+VideoSchema.plugin(mongoosePaginate); 
 
 mongoose.model('Video', VideoSchema);

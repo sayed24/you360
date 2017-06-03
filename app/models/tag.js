@@ -1,7 +1,8 @@
 // Importing Node packages required for schema
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-
+// pagination
+const mongoosePaginate = require('mongoose-paginate');
 //= ===============================
 // Video Schema
 //= ===============================
@@ -12,6 +13,7 @@ const TagSchema = new Schema({
         },
         description: {
             type: String,
+            default: ""
         }
     },
     {
@@ -30,5 +32,8 @@ const TagSchema = new Schema({
 // Tag ORM Virtuals
 //= ===============================
 
-
+/*
+ * pagination
+*/
+TagSchema.plugin(mongoosePaginate);
 mongoose.model('Tag', TagSchema);
