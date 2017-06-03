@@ -33,7 +33,6 @@ router.route('/')
                     message: err.message
                 });
             }
-            //console.log(req.user)
             res.json(users);
            });
         //})
@@ -116,7 +115,7 @@ router.route('/:userId')
     .delete((req, res, next) => {
         User.findOne({_id: req.params.userId}, (err, user) => {
             if (err) {
-                return res.status(422).json({success: false, message: err})
+                return res.status(422).json({success: false, message: err.message})
             }
             if(!user){
                 return res.status(404).json({success: false, message: "User Not found"})
@@ -126,10 +125,10 @@ router.route('/:userId')
             }
             user.remove((err) => {
                 if (err) {
-                    console.log(err.message);
+                    return res.status(422).json({success: false, message: err.message})
                 }
+                res.json({success: true, message: "User Deleted Successfully"})
             });
-            res.json({success: true, message: "User Deleted Successfully"})
         })
     });
 router.get('/:userId/notifications', (req, res, next) => {

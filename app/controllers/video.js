@@ -14,13 +14,13 @@ const router = require('express').Router(),
 const requireAuth = passport.authenticate('jwt', {session: false});
 
 module.exports = function (app) {
-
     app.use('/api/videos', router);
 };
 
 router.use(requireAuth);
 
-router.route('/')
+
+router.route('/stream')
     .get((req, res, next) => {
         let path = process.cwd()+"/public/pano.mp4";
         let stat = fs.statSync(path);
@@ -49,7 +49,11 @@ router.route('/')
             res.writeHead(200, { 'Content-Length': total, 'Content-Type': 'video/mp4' });
             fs.createReadStream(path).pipe(res);
         }
-    })
+    });
+/*
+* CRUD operations
+*/    
+router.route('/')
     //Create New video
     
     //TODO Add video uploader 
@@ -145,9 +149,7 @@ router.route('/')
 
         });
     });
-/*
-* CRUD operations
-*/
+
 router.route('/:videoId')
     //Show video info
     .get((req, res, next) => {
