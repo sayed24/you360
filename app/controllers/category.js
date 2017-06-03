@@ -1,6 +1,6 @@
 const router = require('express').Router(),
 	passport = require('passport'),
-	Tag = require('mongoose').model('Tag'),
+	Category = require('mongoose').model('Category'),
 	//pagination
     mongoosePaginate = require('mongoose-paginate'),
     paginate = require('express-paginate');
@@ -10,23 +10,24 @@ router.use(paginate.middleware(10, 50));
 
 
 module.exports = function (app) {
-    app.use('/api/tags', router);
+    app.use('/api/categories', router);
 };
 
 router.use(requireAuth);
 
 router.route('/')
-	//retrive all tags
+	//retrive all categories
 	.get((req, res, next) => {
-        Tag.paginate({}, { page: req.query.page, limit: req.query.limit }, function(err, tags) {
+        Category.paginate({}, { page: req.query.page, limit: req.query.limit }, function(err, categories) {
             if (err) {
                 res.status(422).json({
                     success: false,
                     message: err.message
                 });
             }
-            res.json(tags);
+            res.json(categories);
            });
+
     })
     .post((req, res, next) => {
         req.checkBody({
@@ -41,60 +42,60 @@ router.route('/')
                 res.status(422).json(result.useFirstErrorOnly().mapped());
                 return;
             }
-            let tag = req.body;
-            Tag.create(tag, (err, tag) => {
+            let category = req.body;
+            Category.create(category, (err, category) => {
                 if (err) {
                     return res.status(422).json({success: false, message: err.message})
                 }
-                res.json({success: true, message: "tag Added Successfully"})
+                res.json({success: true, message: "Category Added Successfully"})
             });
         });
 
     });
-router.route('/:tagId')
+router.route('/:categoryId')
 
-    ////Retrive tag data
+    ////Retrive category data
     .get((req, res, next) => {
-        let query = Tag.findOne({_id: req.params.tagId});
-        query.exec((err, tag) => {
+        let query = Category.findOne({_id: req.params.categoryId});
+        query.exec((err, category) => {
             if (err) {
                 return res.status(422).json({
                     success: false,
                     message: err.message
                 });
             }
-            if(!tag){
-                return res.status(404).json({success: false, message: "Tag Not found"})
+            if(!category){
+                return res.status(404).json({success: false, message: "Category Not found"})
             }
-            res.json(tag);
+            res.json(category);
         });
     })
 
-    //Delete tag 
+    //Delete category 
     .delete((req, res, next) => {
-        Tag.findOne({_id: req.params.tagId}, (err, tag) => {
+        Category.findOne({_id: req.params.categoryId}, (err, category) => {
             if (err) {
                 return res.status(422).json({success: false, message: err.message})
             }
-            if(!tag){
-                return res.status(404).json({success: false, message: "Tag Not found"})
+            if(!category){
+                return res.status(404).json({success: false, message: "Category Not found"})
             }
-            tag.remove((err) => {
+            category.remove((err) => {
             	if (err) {
                     return res.status(422).json({success: false, message: err.message})
                 }
-                res.json({success: true, message: "Tag Deleted Successfully"})
+                res.json({success: true, message: "Category Deleted Successfully"})
             });
         })
 
     })
-    //Update tag info
+    //Update category info
     .put((req, res, next) =>{
-        let taginfo = req.body;
-        Tag.update({_id: req.params.tagId}, {"$set": taginfo}, (err) => {
+        let catinfo = req.body;
+        Category.update({_id: req.params.categoryId}, {"$set": catinfo}, (err) => {
             if (err) {
                 return res.status(422).json({success: false, message: err})
             }
-            res.json({success: true, message: "Tag Updated Successfully"})
+            res.json({success: true, message: "Category Updated Successfully"})
         });
     });
