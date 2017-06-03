@@ -73,22 +73,13 @@ UserSchema.pre('save', function (next) {
         });
     });
 });
-UserSchema.pre('remove', (next) => {
+UserSchema.pre('remove', function (next) {
     // Remove all related docs
     this.model('Notification').remove({to: this._id}, (err) => {
         if (err) {
             console.log(err);
         }
     });
-    this.model('User').find({_id: {"$in": this.friends}}, (err, users) => {
-        if (err) {
-            console.log(err);
-        }
-        users.forEach((user) => {
-            user.unfriendWith(this._id);
-        });
-    });
-
 });
 // Method to compare password for login
 UserSchema.methods.comparePassword = function (candidatePassword, cb) {
