@@ -1,22 +1,18 @@
 const router = require('express').Router(),
-passport = require('passport'),
-fs = require('fs'),
-url = require("url"),
-path = require("path"),
-uuid = require('uuid');
-helpers = require('../helpers'),
-config = require('../../config/config'),
-User = require('mongoose').model('User');
-Video = require('mongoose').model('Video');
-Category =  require('mongoose').model('Category');
-Tag = require('mongoose').model('Tag');
+    passport = require('passport'),
+    uuid = require('uuid');
+    helpers = require('../helpers'),
+    config = require('../../config/config'),
+    User = require('mongoose').model('User'),
+    Video = require('mongoose').model('Video'),
+    Category =  require('mongoose').model('Category'),
+    Tag = require('mongoose').model('Tag'),
+    //pagination
+    mongoosePaginate = require('mongoose-paginate'),
+    paginate = require('express-paginate');
 
 const requireAuth = passport.authenticate('jwt', {session: false});
-/*
-* pagination
-*/
-const mongoosePaginate = require('mongoose-paginate');
-const paginate = require('express-paginate')
+
 router.use(paginate.middleware(10, 50));
 
 module.exports = function (app) {
