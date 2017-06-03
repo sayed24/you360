@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt-nodejs');
 const CONSTANTS = require('../constants');
 const Schema = mongoose.Schema;
+// pagination
+const mongoosePaginate = require('mongoose-paginate');
 
 //= ===============================
 // User Schema
@@ -104,5 +106,10 @@ UserSchema.virtual('notifications', {
     localField: '_id', // Find people where `localField`
     foreignField: 'to' // is equal to `foreignField`
 });
+
+/*
+ * pagination
+*/
+UserSchema.plugin(mongoosePaginate);
 
 mongoose.model('User', UserSchema);
