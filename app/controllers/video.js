@@ -12,6 +12,12 @@ Category =  require('mongoose').model('Category');
 Tag = require('mongoose').model('Tag');
 
 const requireAuth = passport.authenticate('jwt', {session: false});
+/*
+* pagination
+*/
+const mongoosePaginate = require('mongoose-paginate');
+const paginate = require('express-paginate')
+router.use(paginate.middleware(10, 50));
 
 module.exports = function (app) {
     app.use('/api/videos', router);
@@ -54,6 +60,18 @@ router.route('/stream')
 * CRUD operations
 */    
 router.route('/')
+    //Retrive all videos
+    .get((req, res, next) => {
+        Video.paginate({}, { page: req.query.page, limit: req.query.limit }, function(err, videos) {
+            if (err) {
+                res.status(422).json({
+                    success: false,
+                    message: err.message
+                });
+            }
+            res.json(videos);
+           });
+    }) 
     //Create New video
     
     //TODO Add video uploader 
