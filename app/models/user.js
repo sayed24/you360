@@ -45,7 +45,12 @@ const UserSchema = new Schema({
         timestamps: true,
     });
 
-
+UserSchema.methods.toJSON = function() {
+    var obj = this.toObject()
+    delete obj.password
+    delete obj.__v
+    return obj
+}
 //= ===============================
 // User ORM Methods
 //= ===============================
