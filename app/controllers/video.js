@@ -214,3 +214,35 @@ router.route('/:videoId')
     });
 //TODO Add play video link in gui
 
+//Comment CRUD
+router.route('/:videoId/comments')
+    //create new comment
+    .post((req, res, next) => {
+        let commentinfo = req.body;
+        req.checkBody({
+            notEmpty: true,
+            'comment': {
+                notEmpty: true,
+                errorMessage: 'Comment is Required'
+            }
+        })
+        req.getValidationResult().then(function (result) {
+            if (!result.isEmpty()) {
+                res.status(422).json(result.useFirstErrorOnly().mapped());
+                return;
+            }
+
+            commentinfo.uid=req.user._id
+            //console.log(commentinfo)
+            //check why each comment has _id
+            Video.update({_id: req.params.videoId}, {"$push": {"comments":commentinfo}}, (err) => {
+                if (err) {
+                    return res.status(422).json({success: false, message: err})
+                }
+                res.json({success: true, message: "Comment Added and video updated Successfully "})
+            });
+            
+
+        });
+
+    });

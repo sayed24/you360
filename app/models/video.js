@@ -22,7 +22,11 @@ const VideoSchema = new Schema({
         views: {type: Number},
         likes: [{type: Schema.Types.ObjectId, ref: "User"}],
         dislikes: [{type: Schema.Types.ObjectId, ref: "User"}],
-        comments: [{type: Schema.Types.ObjectId, ref: "Comment"}],
+        //comments: [{type: Schema.Types.ObjectId, ref: "Comment"}],
+        comments:[{
+            comment:{type: String},
+            uid:{type: Schema.Types.ObjectId, ref: "User"}
+        }],
         tags: [{type: Schema.Types.ObjectId, ref: "Tag"}],
         category: {type: Schema.Types.ObjectId, ref: "Category"},
         owner: {type: Schema.Types.ObjectId, ref: "User"},
