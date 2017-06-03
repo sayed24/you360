@@ -246,3 +246,32 @@ router.route('/:videoId/comments')
         });
 
     });
+
+router.route('/:videoId/comments/:commentId')
+    .delete((req, res, next) => {
+        //User.findOne({$and:[{_id: req.params.videoId},{comments:commentId}]}, (err, user) => {
+        Video.findOne({_id: req.params.videoId}, (err, video) => {
+            if (err) {
+                return res.status(422).json({success: false, message: err.message})
+            }
+            if(!video){
+                return res.status(404).json({success: false, message: "video Not found"})
+            }
+
+            let comments = video.comments
+
+            console.log(comments)
+            //delete comment from list of comments
+            for (var i = 0; i <= comments.length-1 ; i++) {
+                if(comments[i]._id == req.params.commentId){
+                    comments.splice(i, 1)
+                }
+            }
+            Video.update({_id: req.params.videoId}, {"$set":{comments:comments}}, (err) => {
+                if (err) {
+                    return res.status(422).json({success: false, message: err})
+                }
+                res.json({success: true, message: "Comment deleted and Video Updated Successfully"})
+            });
+        })
+    });
