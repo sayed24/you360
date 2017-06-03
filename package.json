@@ -36,7 +36,8 @@
     "passport-twitter": "^1.0.4",
     "sendgrid": "^4.7.1",
     "socket.io": "^1.4.6",
-    "stripe": "^4.6.0"
+    "stripe": "^4.6.0",
+    "uuid": "^3.0.1"
   },
   "devDependencies": {
     "gulp-jsdoc3": "^1.0.1",

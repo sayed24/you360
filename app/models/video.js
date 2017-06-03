@@ -24,6 +24,7 @@ const VideoSchema = new Schema({
         comments: [{type: Schema.Types.ObjectId, ref: "Comment"}],
         tags: [{type: Schema.Types.ObjectId, ref: "Tag"}],
         category: {type: Schema.Types.ObjectId, ref: "Category"},
+        owner: {type: Schema.Types.ObjectId, ref: "User"},
         thumb: {type: String},
 
     },
