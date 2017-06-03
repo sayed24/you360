@@ -33,7 +33,6 @@ router.route('/')
                     message: err.message
                 });
             }
-            console.log(req.user)
             res.json(users);
            });
         //})

@@ -57,12 +57,11 @@ UserSchema.methods.toJSON = function() {
 // User ORM Methods
 //= ===============================
 
-UserSchema.methods.notifyFor = function notifyFor(notification) {
+UserSchema.methods.notifyFor = function notifyFor(notification,cb) {
     notification.to = this._id
     this.model('Notification').create(notification, (err) => {
-        if (err) {
-            console.log(err);
-        }
+        if (err) cb(err)
+        cb()
     });
 };
 
