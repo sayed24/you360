@@ -179,7 +179,14 @@ router.route('/:videoId')
             if(!video){
                 return res.status(404).json({success: false, message: "Video Not found"})
             }
+            video.likes=3
+            console.log("++++++++++++++++++++++++++++++++++")
+            console.log(video)
             res.json(video);
+            // let v2=video
+            // v2["likes"]="test"//video.likes.length
+            // console.log(v2)
+            // res.json(v2);
         });
     })
 
@@ -370,5 +377,24 @@ router.route('/:videoId/dislikes')
                     res.json({success: true, message:"dislike added Successfully"})
                 })
             })
+        });
+    });
+
+//video views api
+router.route('/:videoId/views')
+    .post((req, res, next) => {
+         Video.findOne({_id: req.params.videoId}, (err, video) => {
+            if (err) {
+                return res.status(422).json({success: false, message: err.message})
+            }
+            if(!video) {
+                return res.status(404).json({success: false, message: "video Not found"})
+            }
+            Video.update({_id: req.params.videoId},{"$inc": {views:1 }}, (err) => {
+                    if (err) {
+                        return res.status(422).json({success: false, message: err.message})
+                    }
+                    res.json({success: true, message:"view added Successfully"})
+                })
         });
     });
