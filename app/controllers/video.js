@@ -20,7 +20,7 @@ module.exports = function (app) {
     app.use('/api/videos', router);
 };
 
-router.use(requireAuth);
+// router.use(requireAuth);
 
 
 router.route('/stream')
