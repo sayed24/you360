@@ -249,7 +249,6 @@ router.route('/:videoId/comments')
 
 router.route('/:videoId/comments/:commentId')
     .delete((req, res, next) => {
-        //User.findOne({$and:[{_id: req.params.videoId},{comments:commentId}]}, (err, user) => {
         Video.findOne({_id: req.params.videoId}, (err, video) => {
             if (err) {
                 return res.status(422).json({success: false, message: err.message})
@@ -265,6 +264,7 @@ router.route('/:videoId/comments/:commentId')
             for (var i = 0; i <= comments.length-1 ; i++) {
                 if(comments[i]._id == req.params.commentId){
                     comments.splice(i, 1)
+                    break
                 }
             }
             Video.update({_id: req.params.videoId}, {"$set":{comments:comments}}, (err) => {
@@ -274,4 +274,48 @@ router.route('/:videoId/comments/:commentId')
                 res.json({success: true, message: "Comment deleted and Video Updated Successfully"})
             });
         })
+    })
+    .put((req, res, next) => {
+        let commentdata = req.body;
+        req.checkBody({
+            notEmpty: true,
+            'comment': {
+                notEmpty: true,
+                errorMessage: 'Comment is Required'
+            }
+        })
+        req.getValidationResult().then(function (result) {
+            if (!result.isEmpty()) {
+                res.status(422).json(result.useFirstErrorOnly().mapped());
+                return;
+            }
+
+            Video.findOne({_id: req.params.videoId}, (err, video) => {
+                if (err) {
+                    return res.status(422).json({success: false, message: err.message})
+                }
+                if(!video){
+                    return res.status(404).json({success: false, message: "video Not found"})
+                }
+                // req.body = {comment:"updated data"}
+                //let commentdata = req.body;
+                if(!commentdata.hasOwnProperty('comment')){
+
+                }
+                let comments=video.comments
+                for (var i = 0; i <= comments.length-1 ; i++) {
+                        if(comments[i]._id == req.params.commentId){
+                            comments[i].comment = commentdata.comment
+                            break
+                        }
+                }
+                
+                Video.update({_id: req.params.videoId}, {"$set":{comments:comments}}, (err) => {
+                    if (err) {
+                        return res.status(422).json({success: false, message: err})
+                    }
+                    res.json({success: true, message: "Comment updated and Video Updated Successfully"})
+                });
+            });    
+        });
     });
