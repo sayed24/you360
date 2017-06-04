@@ -1,6 +1,7 @@
 const router = require('express').Router(),
     passport = require('passport'),
-    uuid = require('uuid');
+    uuid = require('uuid'),
+    fs = require('fs'),
     helpers = require('../helpers'),
     config = require('../../config/config'),
     User = require('mongoose').model('User'),
