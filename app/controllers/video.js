@@ -169,7 +169,7 @@ router.route('/:videoId')
     ////Retrive video data
     .get((req, res, next) => {
         let query = Video.findOne({_id: req.params.videoId});
-        query.exec((err, video) => {
+        query.lean().exec((err, video) => {
             if (err) {
                 return res.status(422).json({
                     success: false,
@@ -179,14 +179,16 @@ router.route('/:videoId')
             if(!video){
                 return res.status(404).json({success: false, message: "Video Not found"})
             }
-            video.likes=3
-            console.log("++++++++++++++++++++++++++++++++++")
-            console.log(video)
+            if(video.likes.includes(req.user._id)){
+                video.liked=true;
+            }  
+            else{
+                video.liked=false;
+            }
+            console.log(req.user._id)
+            video.likes=video.likes.length;
+            video.dislikes=video.dislikes.length;
             res.json(video);
-            // let v2=video
-            // v2["likes"]="test"//video.likes.length
-            // console.log(v2)
-            // res.json(v2);
         });
     })
 

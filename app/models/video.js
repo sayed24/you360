@@ -44,7 +44,6 @@ const VideoSchema = new Schema({
 //= ===============================
 
 
-
 //= ===============================
 // User ORM Virtuals
 //= ===============================
@@ -52,6 +51,7 @@ const VideoSchema = new Schema({
 /*
  * pagination
 */
-VideoSchema.plugin(mongoosePaginate); 
+VideoSchema.plugin(mongoosePaginate);
+
 
 mongoose.model('Video', VideoSchema);
