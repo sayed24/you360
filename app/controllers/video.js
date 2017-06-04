@@ -317,7 +317,7 @@ router.route('/:videoId/comments/:commentId')
         });
     });
 
-//ADD likes and dislikes to video
+//video likes api
 router.route('/:videoId/likes')
     .post((req, res, next) => {
         Video.findOne({_id: req.params.videoId}, (err, video) => {
@@ -339,7 +339,35 @@ router.route('/:videoId/likes')
                     if (err) {
                         return res.status(422).json({success: false, message: err.message})
                     }
-                    res.json("like add")
+                    res.json({success: true, message:"like added Successfully"})
+                })
+            })
+        });
+    });
+
+//video dislikes api
+router.route('/:videoId/dislikes')
+    .post((req, res, next) => {
+        Video.findOne({_id: req.params.videoId}, (err, video) => {
+            if (err) {
+                return res.status(422).json({success: false, message: err.message})
+            }
+            if(!video) {
+                return res.status(404).json({success: false, message: "video Not found"})
+            }
+            let uid=req.user._id
+            //Remove user id from likes array
+            Video.update({"$and":[{_id: req.params.videoId},{"likes": { "$elemMatch": { "$eq": uid}}}]}, {"$pull":{likes:uid}}, (err) => {
+                if (err) {
+                    return res.status(422).json({success: false, message: err.message})
+                }
+                console.log("likeremoved")
+                //add uid to dislike array
+                Video.update({_id: req.params.videoId},{"$addToSet": {dislikes:uid }}, (err) => {
+                    if (err) {
+                        return res.status(422).json({success: false, message: err.message})
+                    }
+                    res.json({success: true, message:"dislike added Successfully"})
                 })
             })
         });
