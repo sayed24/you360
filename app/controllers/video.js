@@ -298,10 +298,10 @@ router.route('/:videoId/comments/:commentId')
                     return res.status(404).json({success: false, message: "video Not found"})
                 }
                 // req.body = {comment:"updated data"}
-                //let commentdata = req.body;
-                if(!commentdata.hasOwnProperty('comment')){
+                let commentdata = req.body;
+                // if(!commentdata.hasOwnProperty('comment')){
 
-                }
+                // }
                 let comments=video.comments
                 for (var i = 0; i <= comments.length-1 ; i++) {
                         if(comments[i]._id == req.params.commentId){
