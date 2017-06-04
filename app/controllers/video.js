@@ -299,9 +299,6 @@ router.route('/:videoId/comments/:commentId')
                 }
                 // req.body = {comment:"updated data"}
                 let commentdata = req.body;
-                // if(!commentdata.hasOwnProperty('comment')){
-
-                // }
                 let comments=video.comments
                 for (var i = 0; i <= comments.length-1 ; i++) {
                         if(comments[i]._id == req.params.commentId){
@@ -317,5 +314,33 @@ router.route('/:videoId/comments/:commentId')
                     res.json({success: true, message: "Comment updated and Video Updated Successfully"})
                 });
             });    
+        });
+    });
+
+//ADD likes and dislikes to video
+router.route('/:videoId/likes')
+    .post((req, res, next) => {
+        Video.findOne({_id: req.params.videoId}, (err, video) => {
+            if (err) {
+                return res.status(422).json({success: false, message: err.message})
+            }
+            if(!video) {
+                return res.status(404).json({success: false, message: "video Not found"})
+            }
+            let uid=req.user._id
+            //Remove user id from dislikes array
+            Video.update({"$and":[{_id: req.params.videoId},{"dislikes": { "$elemMatch": { "$eq": uid}}}]}, {"$pull":{dislikes:uid}}, (err) => {
+                if (err) {
+                    return res.status(422).json({success: false, message: err.message})
+                }
+                console.log("dislikeremoved")
+                //add uid to like array
+                Video.update({_id: req.params.videoId},{"$addToSet": {likes:uid }}, (err) => {
+                    if (err) {
+                        return res.status(422).json({success: false, message: err.message})
+                    }
+                    res.json("like add")
+                })
+            })
         });
     });
