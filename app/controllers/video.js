@@ -19,8 +19,7 @@ router.use(paginate.middleware(10, 50));
 module.exports = function (app) {
     app.use('/api/videos', router);
 };
-
-// router.use(requireAuth);
+router.use(requireAuth);
 
 
 router.route('/stream')
@@ -72,7 +71,7 @@ router.route('/')
     //Create New video
     
     //TODO Add video uploader 
-    .post((req, res, next) => {
+    .post((req, res, next) => { 
         req.checkBody({
             notEmpty: true,
             'name': {
@@ -87,6 +86,14 @@ router.route('/')
                 notEmpty: true,
                 errorMessage: 'category is Required'
             },
+            'latitude': {
+                notEmpty: true,
+                errorMessage: 'latitude is Required'
+            },
+            'longitude':{
+                notEmpty: true,
+                errorMessage: 'longitude is Required'
+            },
         });
         req.getValidationResult().then(function (result) {
             if (!result.isEmpty()) {
@@ -100,6 +107,10 @@ router.route('/')
             video.likes=[]
             video.dislikes=[]
             video.comments=[]
+            console.log("-----------------------------------")
+            console.log(req.user)
+            console.log("-----------------------------------")
+
             video.owner=req.user._id
             //TODO add new tag
             if(!video.hasOwnProperty('tags')){

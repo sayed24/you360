@@ -35,7 +35,6 @@ router.route('/')
             }
             res.json(users);
            });
-        //})
 
     })
     .post((req, res, next) => {

@@ -29,6 +29,14 @@ const VideoSchema = new Schema({
         }],
         tags: [{type: Schema.Types.ObjectId, ref: "Tag"}],
         category: {type: Schema.Types.ObjectId, ref: "Category"},
+        latitude:{
+            type: String,
+            required: true
+        },
+        longitude:{
+            type: String,
+            required: true
+        },
         owner: {type: Schema.Types.ObjectId, ref: "User"},
         thumb: {type: String},
 
