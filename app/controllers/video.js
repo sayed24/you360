@@ -10,7 +10,8 @@ const router = require('express').Router(),
     Tag = require('mongoose').model('Tag'),
     //pagination
     mongoosePaginate = require('mongoose-paginate'),
-    paginate = require('express-paginate');
+    paginate = require('express-paginate'),
+    multer = require('multer');
 
 const requireAuth = passport.authenticate('jwt', {session: false});
 
@@ -19,8 +20,25 @@ router.use(paginate.middleware(10, 50));
 module.exports = function (app) {
     app.use('/api/videos', router);
 };
+
 router.use(requireAuth);
 
+var upload_video = multer({
+    dest: "public/uploads",
+    rename: function (fieldname, filename) {
+        return filename + Date.now();
+    }
+}).single('video');
+
+router.route('/upload').post(function (req, res, next) {
+    upload_video(req, res, function (err) {
+        if (err) {
+            return res.status(400).json({error: err.message})
+        } else {
+            return res.json({file: req.file.filename});
+        }
+    });
+});
 
 router.route('/stream')
     .get((req, res, next) => {
