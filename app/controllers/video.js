@@ -10,7 +10,8 @@ const router = require('express').Router(),
     Tag = require('mongoose').model('Tag'),
     //pagination
     mongoosePaginate = require('mongoose-paginate'),
-    paginate = require('express-paginate');
+    paginate = require('express-paginate'),
+    multer = require('multer');
 
 const requireAuth = passport.authenticate('jwt', {session: false});
 
@@ -20,8 +21,24 @@ module.exports = function (app) {
     app.use('/api/videos', router);
 };
 
-// router.use(requireAuth);
+router.use(requireAuth);
 
+var upload_video = multer({
+    dest: "public/uploads",
+    rename: function (fieldname, filename) {
+        return filename + Date.now();
+    }
+}).single('video');
+
+router.route('/upload').post(function (req, res, next) {
+    upload_video(req, res, function (err) {
+        if (err) {
+            return res.status(400).json({error: err.message})
+        } else {
+            return res.json({file: req.file.filename});
+        }
+    });
+});
 
 router.route('/stream')
     .get((req, res, next) => {
@@ -72,7 +89,7 @@ router.route('/')
     //Create New video
     
     //TODO Add video uploader 
-    .post((req, res, next) => {
+    .post((req, res, next) => { 
         req.checkBody({
             notEmpty: true,
             'name': {
@@ -87,6 +104,14 @@ router.route('/')
                 notEmpty: true,
                 errorMessage: 'category is Required'
             },
+            'latitude': {
+                notEmpty: true,
+                errorMessage: 'latitude is Required'
+            },
+            'longitude':{
+                notEmpty: true,
+                errorMessage: 'longitude is Required'
+            },
         });
         req.getValidationResult().then(function (result) {
             if (!result.isEmpty()) {
@@ -100,6 +125,10 @@ router.route('/')
             video.likes=[]
             video.dislikes=[]
             video.comments=[]
+            console.log("-----------------------------------")
+            console.log(req.user)
+            console.log("-----------------------------------")
+
             video.owner=req.user._id
             //TODO add new tag
             if(!video.hasOwnProperty('tags')){
@@ -170,7 +199,7 @@ router.route('/:videoId')
     ////Retrive video data
     .get((req, res, next) => {
         let query = Video.findOne({_id: req.params.videoId});
-        query.exec((err, video) => {
+        query.lean().exec((err, video) => {
             if (err) {
                 return res.status(422).json({
                     success: false,
@@ -180,6 +209,15 @@ router.route('/:videoId')
             if(!video){
                 return res.status(404).json({success: false, message: "Video Not found"})
             }
+            if(video.likes.includes(req.user._id)){
+                video.liked=true;
+            }  
+            else{
+                video.liked=false;
+            }
+            console.log(req.user._id)
+            video.likes=video.likes.length;
+            video.dislikes=video.dislikes.length;
             res.json(video);
         });
     })
@@ -300,9 +338,6 @@ router.route('/:videoId/comments/:commentId')
                 }
                 // req.body = {comment:"updated data"}
                 let commentdata = req.body;
-                // if(!commentdata.hasOwnProperty('comment')){
-
-                // }
                 let comments=video.comments
                 for (var i = 0; i <= comments.length-1 ; i++) {
                         if(comments[i]._id == req.params.commentId){
@@ -318,5 +353,80 @@ router.route('/:videoId/comments/:commentId')
                     res.json({success: true, message: "Comment updated and Video Updated Successfully"})
                 });
             });    
+        });
+    });
+
+//video likes api
+router.route('/:videoId/likes')
+    .post((req, res, next) => {
+        Video.findOne({_id: req.params.videoId}, (err, video) => {
+            if (err) {
+                return res.status(422).json({success: false, message: err.message})
+            }
+            if(!video) {
+                return res.status(404).json({success: false, message: "video Not found"})
+            }
+            let uid=req.user._id
+            //Remove user id from dislikes array
+            Video.update({"$and":[{_id: req.params.videoId},{"dislikes": { "$elemMatch": { "$eq": uid}}}]}, {"$pull":{dislikes:uid}}, (err) => {
+                if (err) {
+                    return res.status(422).json({success: false, message: err.message})
+                }
+                console.log("dislikeremoved")
+                //add uid to like array
+                Video.update({_id: req.params.videoId},{"$addToSet": {likes:uid }}, (err) => {
+                    if (err) {
+                        return res.status(422).json({success: false, message: err.message})
+                    }
+                    res.json({success: true, message:"like added Successfully"})
+                })
+            })
+        });
+    });
+
+//video dislikes api
+router.route('/:videoId/dislikes')
+    .post((req, res, next) => {
+        Video.findOne({_id: req.params.videoId}, (err, video) => {
+            if (err) {
+                return res.status(422).json({success: false, message: err.message})
+            }
+            if(!video) {
+                return res.status(404).json({success: false, message: "video Not found"})
+            }
+            let uid=req.user._id
+            //Remove user id from likes array
+            Video.update({"$and":[{_id: req.params.videoId},{"likes": { "$elemMatch": { "$eq": uid}}}]}, {"$pull":{likes:uid}}, (err) => {
+                if (err) {
+                    return res.status(422).json({success: false, message: err.message})
+                }
+                console.log("likeremoved")
+                //add uid to dislike array
+                Video.update({_id: req.params.videoId},{"$addToSet": {dislikes:uid }}, (err) => {
+                    if (err) {
+                        return res.status(422).json({success: false, message: err.message})
+                    }
+                    res.json({success: true, message:"dislike added Successfully"})
+                })
+            })
+        });
+    });
+
+//video views api
+router.route('/:videoId/views')
+    .post((req, res, next) => {
+         Video.findOne({_id: req.params.videoId}, (err, video) => {
+            if (err) {
+                return res.status(422).json({success: false, message: err.message})
+            }
+            if(!video) {
+                return res.status(404).json({success: false, message: "video Not found"})
+            }
+            Video.update({_id: req.params.videoId},{"$inc": {views:1 }}, (err) => {
+                    if (err) {
+                        return res.status(422).json({success: false, message: err.message})
+                    }
+                    res.json({success: true, message:"view added Successfully"})
+                })
         });
     });
