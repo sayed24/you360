@@ -20,54 +20,59 @@ const videoId = "59334fd7f25144336c3e4078"
 const comment = "hello. "
 
 describe('************* Socket Test *************',function(){
-	this.timeout(15000);
+	this.timeout(50000);
 	/* Test 1 - User uploade new video.*/
 	it('Should broadcast new video',function(done){
-		this.timeout(15000);
+		//this.timeout(15000);
     	//setTimeout(done, 15000)
 		//let client = io.connect(socketURL);
-		let client1, client2, client3;
-		let count=0;
-		var checkvideoid = function(client){
-			client.on('new video', function(vid){
-	        	vid.should.equal(videoId);
-	        	client.disconnect();
-	        	count++;
-	        	if(count === 3){
-	        		done();
-	        	};
-	        });
-		};
-        client1 = io.connect(socketURL);
-		
-		client1.on('connect', function(data){
-			//login
-			client1.emit('login',User1)
-			checkvideoid(client1);
-			 /* Since first client is connected, we connect the second client. */
-			client2 = io.connect(socketURL);
-			client2.on('connect', function(data){
-				client2.emit('login',User2)
-				checkvideoid(client2);
-				client3 = io.connect(socketURL);
-				
-				client3.on('connect', function(data){
-					client3.emit('login',User3)
-					checkvideoid(client3);
-  					client2.emit('new video created',videoId)
-  				//end of client3
-  				});
-  			//end of client2	
+		try{
+			let client1, client2, client3;
+			let count=0;
+			var checkvideoid = function(client){
+				client.on('new video', function(vid){
+		        	vid.should.equal(videoId);
+		        	client.disconnect();
+		        	count++;
+		        	if(count === 3){
+		        		done();
+		        	};
+		        });
+			};
+	        client1 = io.connect(socketURL);
+			
+			client1.on('connect', function(data){
+				//login
+				client1.emit('login',User1)
+				checkvideoid(client1);
+				 /* Since first client is connected, we connect the second client. */
+				client2 = io.connect(socketURL);
+				client2.on('connect', function(data){
+					client2.emit('login',User2)
+					checkvideoid(client2);
+					client3 = io.connect(socketURL);
+					
+					client3.on('connect', function(data){
+						client3.emit('login',User3)
+						checkvideoid(client3);
+	  					client2.emit('new video created',videoId)
+	  				//end of client3
+	  				});
+	  			//end of client2	
+				});
+			//end of client1
 			});
-		//end of client1
-		});        
+		}
+		catch(err){
+			done(err)
+		}        
 	// end of it
 	});
 
 
 /* Test 2 - User like a video.*/
 	it('Should broadcast one of the videos liked',function(done){
-		this.timeout(15000);
+		//this.timeout(15000);
 		let client1, client2, client3;
 		let count=0;
 		var checkvideoid = function(client){
