@@ -35,7 +35,7 @@ router.route('/upload').post(function (req, res, next) {
         if (err) {
             return res.status(400).json({error: err.message})
         } else {
-            return res.json({file: req.file.filename});
+            return res.json({filename: req.file.filename});
         }
     });
 });
@@ -104,14 +104,14 @@ router.route('/')
                 notEmpty: true,
                 errorMessage: 'category is Required'
             },
-            'lat': {
-                notEmpty: true,
-                errorMessage: 'latitude is Required'
-            },
-            'long':{
-                notEmpty: true,
-                errorMessage: 'longitude is Required'
-            },
+            // 'lat': {
+            //     notEmpty: true,
+            //     errorMessage: 'latitude is Required'
+            // },
+            // 'long':{
+            //     notEmpty: true,
+            //     errorMessage: 'longitude is Required'
+            // },
         });
         req.getValidationResult().then(function (result) {
             if (!result.isEmpty()) {
