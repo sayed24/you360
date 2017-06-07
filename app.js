@@ -1,8 +1,10 @@
 var express = require('express'),
     config = require('./config/config'),
     glob = require('glob'),
-    socketEvents = require('./socketEvents'),
-    mongoose = require('mongoose');
+    // socketEvents = require('./socketEvents'),
+	socketEvents = require('./app/controllers/sockio.js'),
+    mongoose = require('mongoose'),
+    socketIO = require('socket.io');
 
 mongoose.connect(config.db);
 var db = mongoose.connection;
@@ -26,7 +28,7 @@ let server=app.listen(config.port, function () {
     console.log('Express server listening on port ' + config.port);
 });
 //socket io server
-const io = require('socket.io').listen(server);
+const io = socketIO.listen(server);
 // io.set('origins','*:*');
 socketEvents(io);
 
