@@ -1,5 +1,6 @@
 // Importing Node packages required for schema
 const mongoose = require('mongoose');
+const helpers = require('../helpers');
 const Schema = mongoose.Schema;
 // pagination
 const mongoosePaginate = require('mongoose-paginate');
@@ -46,7 +47,11 @@ const VideoSchema = new Schema({
         timestamps: true,
     });
 
-
+VideoSchema.pre('remove', function (next) {
+    // Remove all related docs
+    helpers.removeFile(this.image);
+    next();
+});
 //= ===============================
 // Video ORM Methods
 //= ===============================

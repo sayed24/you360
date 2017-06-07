@@ -2,6 +2,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt-nodejs');
 const CONSTANTS = require('../constants');
+const helpers = require('../helpers');
 const Schema = mongoose.Schema;
 // pagination
 const mongoosePaginate = require('mongoose-paginate');
@@ -81,10 +82,12 @@ UserSchema.pre('save', function (next) {
 });
 UserSchema.pre('remove', function (next) {
     // Remove all related docs
+    helpers.removeFile(this.image);
     this.model('Notification').remove({to: this._id}, (err) => {
         if (err) return next(err);
         next();
     });
+
 });
 // Method to compare password for login
 UserSchema.methods.comparePassword = function (candidatePassword, cb) {
