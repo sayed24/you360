@@ -29,6 +29,7 @@ const requireLogin = passport.authenticate('local', {session: false});
 router.post('/login', requireLogin, (req, res, next) => {
     const userInfo = helpers.setUserInfo(req.user);
     res.status(200).json({
+        status:"success",
         token: `JWT ${generateToken(userInfo)}`,
         user: userInfo
     });
@@ -85,6 +86,7 @@ router.post('/register', (req, res, next) => {
 
             const userInfo = helpers.setUserInfo(user);
             res.status(201).json({
+                status:"success",
                 token: `JWT ${generateToken(userInfo)}`,
                 user: userInfo
             });
