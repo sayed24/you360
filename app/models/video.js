@@ -32,11 +32,11 @@ const VideoSchema = new Schema({
         category: {type: Schema.Types.ObjectId, ref: "Category"},
         latitude:{
             type: String,
-            required: true
+            // required: true
         },
         longitude:{
             type: String,
-            required: true
+            // required: true
         },
         owner: {type: Schema.Types.ObjectId, ref: "User"},
         thumb: {type: String},
