@@ -36,6 +36,7 @@
     "passport-twitter": "^1.0.4",
     "sendgrid": "^4.7.1",
     "socket.io": "^1.7.4",
+    "socket.io-client": "^2.0.2",
     "stripe": "^4.6.0",
     "uuid": "^3.0.1"
   },

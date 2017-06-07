@@ -28,7 +28,7 @@ exports = module.exports = function (io) {
                 user.save()
             }).catch((error) => {
                 console.log(error.message);
-            });
+             });
             delete users[socket.userId];
         });
         socket.on('leave conversation', (conversation) => {
