@@ -104,11 +104,11 @@ router.route('/')
                 notEmpty: true,
                 errorMessage: 'category is Required'
             },
-            'latitude': {
+            'lat': {
                 notEmpty: true,
                 errorMessage: 'latitude is Required'
             },
-            'longitude':{
+            'long':{
                 notEmpty: true,
                 errorMessage: 'longitude is Required'
             },
@@ -119,7 +119,10 @@ router.route('/')
                 return;
             }
             let video = req.body;
-            
+            //if there is a thumb save it
+            if(video.thumb){
+                video.thumb=helpers.saveFile(video.thumb)
+            }
             video.filename="filename_"+uuid.v1()
             video.views=0
             video.likes=[]
