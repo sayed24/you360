@@ -21,7 +21,7 @@ module.exports = function (app) {
     app.use('/api/videos', router);
 };
 
-router.use(requireAuth);
+// router.use(requireAuth);
 
 var upload_video = multer({
     dest: "public/uploads",

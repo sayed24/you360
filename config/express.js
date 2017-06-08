@@ -16,17 +16,20 @@ module.exports = function (app, config) {
     // app.set('views', config.root + '/app/views');
     // app.set('view engine', 'ejs');
     // Enable CORS from client-side
-    // var whitelist = ['http://example1.com', 'http://example2.com']
-    // var corsOptions = {
-    //     origin: function (origin, callback) {
-    //         if (whitelist.indexOf(origin) !== -1) {
-    //             callback(null, true)
-    //         } else {
-    //             callback(new Error('Not allowed by CORS'))
-    //         }
-    //     }
-    // }
-    app.use(cors());
+    const whitelist = ['http://localhost:8100', 'http://localhost:4200']
+    const corsOptions = {
+        origin: function (origin, callback) {
+            if (whitelist.indexOf(origin) !== -1) {
+                callback(null, true)
+            } else {
+                callback(new Error('Not allowed by CORS'))
+            }
+        },
+        credentials:true,
+
+    }
+    app.use(cors(corsOptions));
+    app.options('*', cors())
     app.use(express.static(config.root + '/public'));
     app.use(cookieParser());
     app.use(bodyParser.json({limit: '50mb'}));
