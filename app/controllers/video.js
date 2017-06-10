@@ -11,6 +11,8 @@ const router = require('express').Router(),
     //pagination
     mongoosePaginate = require('mongoose-paginate'),
     paginate = require('express-paginate'),
+    //search 
+    mongooseApiQuery = require('mongoose-api-query'),
     multer = require('multer');
 
 const requireAuth = passport.authenticate('jwt', {session: false});
@@ -70,6 +72,33 @@ router.route('/stream')
             fs.createReadStream(path).pipe(res);
         }
     });
+
+//SEARCH
+
+router.route('/search')
+    .get((req, res, next) => {
+        console.log(req.query)
+        let q= req.query
+        delete q['limit']
+        delete q['page']
+        Video.apiQuery(q, (err, videos) => {
+            if (err) {
+                res.status(422).json({
+                    success: false,
+                    message: err.message
+                });
+            }
+            // console.log(typeof(videos))
+            // if(!videos){
+            //     return res.status(404).json({success: false, message: "Video Not found"})
+            // }
+            res.json(videos);
+        })
+    //end of get
+    });
+
+
+
 /*
 * CRUD operations
 */    
@@ -227,7 +256,9 @@ router.route('/:videoId')
 
     //Delete video 
     .delete((req, res, next) => {
+        console.log("+++++++++++++++ \n"+req.params.videoId)
         Video.findOne({_id: req.params.videoId}, (err, video) => {
+
             if (err) {
                 return res.status(422).json({success: false, message: err.message})
             }
