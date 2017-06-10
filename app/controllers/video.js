@@ -9,9 +9,7 @@ const router = require('express').Router(),
     Category = require('mongoose').model('Category'),
     Tag = require('mongoose').model('Tag'),
     //pagination
-    paginate = require('express-paginate'),
-    multer = require('multer');
-
+    paginate = require('express-paginate');
 const requireAuth = passport.authenticate('jwt', {session: false});
 
 router.use(paginate.middleware(10, 50));
@@ -20,13 +18,6 @@ module.exports = function (app) {
     app.use('/api/videos', router);
 };
 
-
-var upload_video = multer({
-    dest: process.cwd()+"/public/uploads/",
-    rename: function (fieldname, filename) {
-        return Math.round(Math.random()*10000000) +""+ +new Date();
-    }
-}).single('video');
 router.get('/stream', (req, res, next) => {
     let path = process.cwd() + "/public/pano.mp4";
     let stat = fs.statSync(path);
@@ -61,13 +52,7 @@ router.get('/stream', (req, res, next) => {
 router.use(requireAuth);
 
 router.post('/upload', function (req, res, next) {
-    upload_video(req, res, function (err) {
-        if (err) {
-            return res.status(400).json({error: err.message})
-        } else {
-            return res.json({filename: req.file.filename});
-        }
-    });
+    return res.json({filename: req.file[0].filename});
 });
 
 

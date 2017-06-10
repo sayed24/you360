@@ -6,6 +6,8 @@ const bodyParser = require('body-parser');
 const compress = require('compression');
 const expressValidator = require('express-validator');
 const cors = require('cors');
+const multer = require('multer');
+
 // var methodOverride = require('method-override');
 
 module.exports = function (app, config) {
@@ -13,21 +15,6 @@ module.exports = function (app, config) {
     app.locals.ENV = env;
     app.locals.ENV_DEVELOPMENT = env == 'development';
 
-    // app.set('views', config.root + '/app/views');
-    // app.set('view engine', 'ejs');
-    // Enable CORS from client-side
-    // const whitelist = ['http://localhost:8100', 'http://localhost:4200']
-    // const corsOptions = {
-    //     origin: function (origin, callback) {
-    //         if (whitelist.indexOf(origin) !== -1) {
-    //             callback(null, true)
-    //         } else {
-    //             callback(new Error('Not allowed by CORS'))
-    //         }
-    //     },
-    //     credentials:true,
-    //
-    // }
     app.use(cors());
     // app.options('*', cors())
     app.use(express.static(config.root + '/public'));
@@ -39,9 +26,9 @@ module.exports = function (app, config) {
         res.sendFile(process.cwd()+'/public/index.html')
     })
     // app.use(favicon(config.root + '/public/img/favicon.ico'));
-    // const upload=multer({dest: './public/uploads/'});
-    // const cpUpload = upload.fields([{ name: 'image', maxCount: 1 },{ name: 'photo', maxCount: 1 },{ name: 'avatar', maxCount: 1 }])
-    // app.use(cpUpload);
+    const upload=multer({dest: './public/uploads/'});
+    const cpUpload = upload.fields([{ name: 'image', maxCount: 1 },{ name: 'photo', maxCount: 1 },{ name: 'avatar', maxCount: 1 }])
+    app.use(cpUpload);
     app.use(logger('dev'));
     app.use(compress());
 
