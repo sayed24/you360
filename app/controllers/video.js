@@ -6,10 +6,9 @@ const router = require('express').Router(),
     config = require('../../config/config'),
     User = require('mongoose').model('User'),
     Video = require('mongoose').model('Video'),
-    Category =  require('mongoose').model('Category'),
+    Category = require('mongoose').model('Category'),
     Tag = require('mongoose').model('Tag'),
     //pagination
-    mongoosePaginate = require('mongoose-paginate'),
     paginate = require('express-paginate'),
     //search 
     mongooseApiQuery = require('mongoose-api-query'),
@@ -23,16 +22,47 @@ module.exports = function (app) {
     app.use('/api/videos', router);
 };
 
-router.use(requireAuth);
 
 var upload_video = multer({
     dest: "public/uploads",
     rename: function (fieldname, filename) {
-        return filename + Date.now();
+        return Math.round(Math.random()*10000000) +""+ +new Date();
     }
 }).single('video');
+router.get('/stream', (req, res, next) => {
+    let path = process.cwd() + "/public/pano.mp4";
+    let stat = fs.statSync(path);
+    let total = stat.size;
+    if (req.headers['range']) {
+        let range = req.headers.range;
+        let parts = range.replace(/bytes=/, "").split("-");
+        let partialstart = parts[0];
+        let partialend = parts[1];
 
-router.route('/upload').post(function (req, res, next) {
+        let start = parseInt(partialstart, 10);
+        let end = partialend ? parseInt(partialend, 10) : total - 1;
+        let chunksize = (end - start) + 1;
+        console.log('RANGE: ' + start + ' - ' + end + ' = ' + chunksize);
+
+        let file = fs.createReadStream(path, {start: start, end: end});
+        res.writeHead(206, {
+            'Content-Range': 'bytes ' + start + '-' + end + '/' + total,
+            'Accept-Ranges': 'bytes',
+            'Content-Length': chunksize,
+            'Content-Type': 'video/mp4'
+        });
+        file.pipe(res);
+    } else {
+        console.log('ALL: ' + total);
+        res.writeHead(200, {'Content-Length': total, 'Content-Type': 'video/mp4'});
+        fs.createReadStream(path).pipe(res);
+    }
+});
+
+
+router.use(requireAuth);
+
+router.post('/upload', function (req, res, next) {
     upload_video(req, res, function (err) {
         if (err) {
             return res.status(400).json({error: err.message})
@@ -98,14 +128,13 @@ router.route('/search')
     });
 
 
-
 /*
 * CRUD operations
-*/    
+*/
 router.route('/')
-    //Retrive all videos
+//Retrive all videos
     .get((req, res, next) => {
-        Video.paginate({}, { page: req.query.page, limit: req.query.limit }, function(err, videos) {
+        Video.paginate({}, {page: req.query.page, limit: req.query.limit}, function (err, videos) {
             if (err) {
                 res.status(422).json({
                     success: false,
@@ -113,12 +142,12 @@ router.route('/')
                 });
             }
             res.json(videos);
-           });
-    }) 
+        });
+    })
     //Create New video
-    
+
     //TODO Add video uploader 
-    .post((req, res, next) => { 
+    .post((req, res, next) => {
         req.checkBody({
             notEmpty: true,
             'name': {
@@ -149,22 +178,25 @@ router.route('/')
             }
             let video = req.body;
             //if there is a thumb save it
-            if(video.thumb){
-                video.thumb=helpers.saveFile(video.thumb)
+            if (video.thumb) {
+                video.thumb = helpers.saveFile(video.thumb)
             }
-            video.filename="filename_"+uuid.v1()
-            video.views=0
-            video.likes=[]
-            video.dislikes=[]
-            video.comments=[]
+            /*منك لله يامنار لفيت ساعتين وقعدت اغير ودوغت والاخر لقيتك انتا الى غيرتيه */
+
+            /*شكرا بس انا كنت قايلالك*/
+            // video.filename = "filename_" + uuid.v1()
+            video.views = 0
+            video.likes = []
+            video.dislikes = []
+            video.comments = []
             console.log("-----------------------------------")
             console.log(req.user)
             console.log("-----------------------------------")
 
-            video.owner=req.user._id
+            video.owner = req.user._id
             //TODO add new tag
-            if(!video.hasOwnProperty('tags')){
-                video.tags=[]
+            if (!video.hasOwnProperty('tags')) {
+                video.tags = []
             }
             //check if this category exist so put this id else create new one
 
@@ -212,23 +244,23 @@ router.route('/')
             //     //check if this tag exist so put it in tags else create new one
             // }
 
-            
+
             //res.json(video)
-        
+
             Video.create(video, (err, user) => {
                 if (err) {
                     return res.status(422).json({success: false, message: err.message})
                 }
                 res.json({success: true, message: "video Added Successfully"})
             });
-            
+
 
         });
     });
 
 router.route('/:videoId')
-    
-    ////Retrive video data
+
+////Retrive video data
     .get((req, res, next) => {
         let query = Video.findOne({_id: req.params.videoId});
         query.lean().exec((err, video) => {
@@ -238,18 +270,18 @@ router.route('/:videoId')
                     message: err.message
                 });
             }
-            if(!video){
+            if (!video) {
                 return res.status(404).json({success: false, message: "Video Not found"})
             }
-            if(video.likes.includes(req.user._id)){
-                video.liked=true;
-            }  
-            else{
-                video.liked=false;
+            if (video.likes.includes(req.user._id)) {
+                video.liked = true;
+            }
+            else {
+                video.liked = false;
             }
             console.log(req.user._id)
-            video.likes=video.likes.length;
-            video.dislikes=video.dislikes.length;
+            video.likes = video.likes.length;
+            video.dislikes = video.dislikes.length;
             res.json(video);
         });
     })
@@ -262,7 +294,7 @@ router.route('/:videoId')
             if (err) {
                 return res.status(422).json({success: false, message: err.message})
             }
-            if(!video){
+            if (!video) {
                 return res.status(404).json({success: false, message: "Video Not found"})
             }
             video.remove((err) => {
@@ -275,7 +307,7 @@ router.route('/:videoId')
 
     })
     //Update video info
-    .put((req, res, next) =>{
+    .put((req, res, next) => {
         //update name,description,cat,tag
         let videoinfo = req.body;
         Video.update({_id: req.params.videoId}, {"$set": videoinfo}, (err) => {
@@ -289,7 +321,7 @@ router.route('/:videoId')
 
 //Comment CRUD
 router.route('/:videoId/comments')
-    //create new comment
+//create new comment
     .post((req, res, next) => {
         let commentinfo = req.body;
         req.checkBody({
@@ -305,16 +337,16 @@ router.route('/:videoId/comments')
                 return;
             }
 
-            commentinfo.uid=req.user._id
+            commentinfo.uid = req.user._id
             //console.log(commentinfo)
             //check why each comment has _id
-            Video.update({_id: req.params.videoId}, {"$push": {"comments":commentinfo}}, (err) => {
+            Video.update({_id: req.params.videoId}, {"$push": {"comments": commentinfo}}, (err) => {
                 if (err) {
                     return res.status(422).json({success: false, message: err})
                 }
                 res.json({success: true, message: "Comment Added and video updated Successfully "})
             });
-            
+
 
         });
 
@@ -326,7 +358,7 @@ router.route('/:videoId/comments/:commentId')
             if (err) {
                 return res.status(422).json({success: false, message: err.message})
             }
-            if(!video){
+            if (!video) {
                 return res.status(404).json({success: false, message: "video Not found"})
             }
 
@@ -334,13 +366,13 @@ router.route('/:videoId/comments/:commentId')
 
             console.log(comments)
             //delete comment from list of comments
-            for (var i = 0; i <= comments.length-1 ; i++) {
-                if(comments[i]._id == req.params.commentId){
+            for (var i = 0; i <= comments.length - 1; i++) {
+                if (comments[i]._id == req.params.commentId) {
                     comments.splice(i, 1)
                     break
                 }
             }
-            Video.update({_id: req.params.videoId}, {"$set":{comments:comments}}, (err) => {
+            Video.update({_id: req.params.videoId}, {"$set": {comments: comments}}, (err) => {
                 if (err) {
                     return res.status(422).json({success: false, message: err})
                 }
@@ -367,26 +399,26 @@ router.route('/:videoId/comments/:commentId')
                 if (err) {
                     return res.status(422).json({success: false, message: err.message})
                 }
-                if(!video){
+                if (!video) {
                     return res.status(404).json({success: false, message: "video Not found"})
                 }
                 // req.body = {comment:"updated data"}
                 let commentdata = req.body;
-                let comments=video.comments
-                for (var i = 0; i <= comments.length-1 ; i++) {
-                        if(comments[i]._id == req.params.commentId){
-                            comments[i].comment = commentdata.comment
-                            break
-                        }
+                let comments = video.comments
+                for (var i = 0; i <= comments.length - 1; i++) {
+                    if (comments[i]._id == req.params.commentId) {
+                        comments[i].comment = commentdata.comment
+                        break
+                    }
                 }
-                
-                Video.update({_id: req.params.videoId}, {"$set":{comments:comments}}, (err) => {
+
+                Video.update({_id: req.params.videoId}, {"$set": {comments: comments}}, (err) => {
                     if (err) {
                         return res.status(422).json({success: false, message: err})
                     }
                     res.json({success: true, message: "Comment updated and Video Updated Successfully"})
                 });
-            });    
+            });
         });
     });
 
@@ -397,22 +429,22 @@ router.route('/:videoId/likes')
             if (err) {
                 return res.status(422).json({success: false, message: err.message})
             }
-            if(!video) {
+            if (!video) {
                 return res.status(404).json({success: false, message: "video Not found"})
             }
-            let uid=req.user._id
+            let uid = req.user._id
             //Remove user id from dislikes array
-            Video.update({"$and":[{_id: req.params.videoId},{"dislikes": { "$elemMatch": { "$eq": uid}}}]}, {"$pull":{dislikes:uid}}, (err) => {
+            Video.update({"$and": [{_id: req.params.videoId}, {"dislikes": {"$elemMatch": {"$eq": uid}}}]}, {"$pull": {dislikes: uid}}, (err) => {
                 if (err) {
                     return res.status(422).json({success: false, message: err.message})
                 }
                 console.log("dislikeremoved")
                 //add uid to like array
-                Video.update({_id: req.params.videoId},{"$addToSet": {likes:uid }}, (err) => {
+                Video.update({_id: req.params.videoId}, {"$addToSet": {likes: uid}}, (err) => {
                     if (err) {
                         return res.status(422).json({success: false, message: err.message})
                     }
-                    res.json({success: true, message:"like added Successfully"})
+                    res.json({success: true, message: "like added Successfully"})
                 })
             })
         });
@@ -425,22 +457,22 @@ router.route('/:videoId/dislikes')
             if (err) {
                 return res.status(422).json({success: false, message: err.message})
             }
-            if(!video) {
+            if (!video) {
                 return res.status(404).json({success: false, message: "video Not found"})
             }
-            let uid=req.user._id
+            let uid = req.user._id
             //Remove user id from likes array
-            Video.update({"$and":[{_id: req.params.videoId},{"likes": { "$elemMatch": { "$eq": uid}}}]}, {"$pull":{likes:uid}}, (err) => {
+            Video.update({"$and": [{_id: req.params.videoId}, {"likes": {"$elemMatch": {"$eq": uid}}}]}, {"$pull": {likes: uid}}, (err) => {
                 if (err) {
                     return res.status(422).json({success: false, message: err.message})
                 }
                 console.log("likeremoved")
                 //add uid to dislike array
-                Video.update({_id: req.params.videoId},{"$addToSet": {dislikes:uid }}, (err) => {
+                Video.update({_id: req.params.videoId}, {"$addToSet": {dislikes: uid}}, (err) => {
                     if (err) {
                         return res.status(422).json({success: false, message: err.message})
                     }
-                    res.json({success: true, message:"dislike added Successfully"})
+                    res.json({success: true, message: "dislike added Successfully"})
                 })
             })
         });
@@ -449,18 +481,18 @@ router.route('/:videoId/dislikes')
 //video views api
 router.route('/:videoId/views')
     .post((req, res, next) => {
-         Video.findOne({_id: req.params.videoId}, (err, video) => {
+        Video.findOne({_id: req.params.videoId}, (err, video) => {
             if (err) {
                 return res.status(422).json({success: false, message: err.message})
             }
-            if(!video) {
+            if (!video) {
                 return res.status(404).json({success: false, message: "video Not found"})
             }
-            Video.update({_id: req.params.videoId},{"$inc": {views:1 }}, (err) => {
-                    if (err) {
-                        return res.status(422).json({success: false, message: err.message})
-                    }
-                    res.json({success: true, message:"view added Successfully"})
-                })
+            Video.update({_id: req.params.videoId}, {"$inc": {views: 1}}, (err) => {
+                if (err) {
+                    return res.status(422).json({success: false, message: err.message})
+                }
+                res.json({success: true, message: "view added Successfully"})
+            })
         });
     });
