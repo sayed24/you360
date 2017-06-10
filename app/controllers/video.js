@@ -22,9 +22,9 @@ module.exports = function (app) {
 
 
 var upload_video = multer({
-    dest: "public/uploads",
+    dest: process.cwd()+"/public/uploads/",
     rename: function (fieldname, filename) {
-        return filename + Date.now();
+        return Math.round(Math.random()*10000000) +""+ +new Date();
     }
 }).single('video');
 router.get('/stream', (req, res, next) => {

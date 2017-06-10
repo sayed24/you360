@@ -45,11 +45,10 @@ exports.saveFile=function saveFile(file){
     let matches = file.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/)
     let imbuffer = new Buffer(matches[2], 'base64')
     fs.writeFileSync(path, imbuffer);
-    return 'https://yalabenanotlob.herokuapp.com/uploads/'+name;
+    return name;
 }
 exports.removeFile=function removeFile(file){
-    let matches = file.match(/\/([^/]+)$/);
-    let path=process.cwd()+"/public/uploads/"+matches[1];
+    let path=process.cwd()+"/public/uploads/"+file;
     if (fs.existsSync(path)) {
         fs.unlink(path);
     }
