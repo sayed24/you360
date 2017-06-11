@@ -1,3 +1,5 @@
+const mongoose = require('mongoose');
+
 exports = module.exports = function (sio) {
 	sio.on('connection', (socket) => {
     	//console.log('a user connected');
@@ -20,16 +22,23 @@ exports = module.exports = function (sio) {
     	//event for upload new video
     	socket.on('new video created', (videoId) => {
         	//brodcast new video id
-        	sio.sockets.in('online').emit('new video', videoId);
+            //get video info
+                
+            get_video_info(sio,videoId,'new video')
+            
+        	
         });
 		//event for like video
     	socket.on('likes', (videoId) => {
-        	sio.sockets.in('online').emit('increase likes', videoId);
+            get_video_info(sio,videoId,'increase likes')
+        	
 
         });
 		//event for dislike video
     	socket.on('dislikes', (videoId) => {
-        	sio.sockets.in('online').emit('increase dislikes', videoId);
+            get_video_info(sio,videoId,'increase dislikes')
+
+        	//sio.sockets.in('online').emit('increase dislikes', videoId);
         });
     	//event for new comment added
     	socket.on('new comment', (comment) => {
@@ -38,8 +47,27 @@ exports = module.exports = function (sio) {
         });
         //event for video viewed
     	socket.on('increase views count', (videoId) => {
-	        sio.sockets.in('online').emit('increase views', videoId);
+            get_video_info(sio,videoId,'increase views')
+	        //sio.sockets.in('online').emit('increase views', videoId);
         });
           
 	});
 };
+
+get_video_info = function get_video_info(sio,videoId,emitmsg) {
+                    let query =  mongoose.model('Video').findOne({_id:videoId});
+                    query.lean().exec((err, video) => {
+                         if (err) {
+                            return res.status(422).json({
+                                success: false,
+                                message: err.message
+                            });
+                        }
+                        if (!video) {
+                            return res.status(404).json({success: false, message: "Video Not found"})
+                        }
+                        video.likes = video.likes.length;
+                        video.dislikes = video.dislikes.length;
+                        sio.sockets.in('online').emit(emitmsg, video);
+                    })
+                }

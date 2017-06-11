@@ -18,6 +18,19 @@ const User3 = { _id: '12345', password: 'secret', lastName: 'test', firstName: '
 
 const videoId = "59334fd7f25144336c3e4078"
 const comment = "hello. "
+// const video ={
+// 	"_id" : videoId,
+// 	"name" : "vi",
+// 	"description" : "test",
+// 	"filename" : "1dd",
+// 	"views" : 0,
+// 	"tags" : [ ],
+// 	"comments" : [ ],
+// 	"dislikes" : [ ],
+// 	"likes" : [ ],
+// 	"__v" : 0
+// }
+
 
 describe('************* Socket Test *************',function(){
 
@@ -31,8 +44,9 @@ describe('************* Socket Test *************',function(){
 			let client1, client2, client3;
 			let count=0;
 			var checkvideoid = function(client){
-				client.on('new video', function(vid){
-		        	vid.should.equal(videoId);
+				client.on('new video', function(video){
+					//console.log(video)
+		        	video["_id"].should.equal(videoId);
 		        	client.disconnect();
 		        	count++;
 		        	if(count === 3){
@@ -77,8 +91,8 @@ describe('************* Socket Test *************',function(){
 		let client1, client2, client3;
 		let count=0;
 		var checkvideoid = function(client){
-			client.on('increase likes', function(vid){
-	        	vid.should.equal(videoId);
+			client.on('increase likes', function(video){
+	        	video["_id"].should.equal(videoId);
 	        	client.disconnect();
 	        	count++;
 	        	if(count === 3){
@@ -118,8 +132,8 @@ describe('************* Socket Test *************',function(){
 		let client1, client2, client3;
 		let count=0;
 		var checkvideoid = function(client){
-			client.on('increase dislikes', function(vid){
-	        	vid.should.equal(videoId);
+			client.on('increase dislikes', function(video){
+	        	video["_id"].should.equal(videoId);
 	        	client.disconnect();
 	        	count++;
 	        	if(count === 3){
@@ -159,8 +173,8 @@ describe('************* Socket Test *************',function(){
 		let client1, client2, client3;
 		let count=0;
 		var checkvideoid = function(client){
-			client.on('increase views', function(vid){
-	        	vid.should.equal(videoId);
+			client.on('increase views', function(video){
+	        	video["_id"].should.equal(videoId);
 	        	client.disconnect();
 	        	count++;
 	        	if(count === 3){

@@ -139,15 +139,10 @@ router.route('/tags')
                 });
             }
             let tagarr=[]
-            console.log("\n taf \n "+typeof(tagarr))
             for(tag in tags){
-              //  tagarr.push(tags[tag].tags)
                 tagarr=tagarr.concat(tags[tag].tags)
             }
             tagarr=helpers.mergeArrayUnique(tagarr)
-            //console.log("\n ++++++++++++ \n "+_.union(tagarr))
-            // console.log("\n ++++++++++++ \n "+typeof(tagarr))
-
             res.json(tagarr);
         });
     })
