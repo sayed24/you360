@@ -31,7 +31,7 @@ const VideoSchema = new Schema({
             uid:{type: Schema.Types.ObjectId, ref: "User"}
         }],
         //tags: [{type: Schema.Types.ObjectId, ref: "Tag"}],
-        tags: [String],
+        tags: [{type: String}],
         category: {type: Schema.Types.ObjectId, ref: "Category"},
         lat:{
             type: String,

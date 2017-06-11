@@ -138,14 +138,15 @@ router.route('/tags')
                     message: err.message
                 });
             }
-            tagarr=[]
+            let tagarr=[]
+            console.log("\n taf \n "+typeof(tagarr))
             for(tag in tags){
-                console.log(tags[tag].tags)
-                tagarr.concat(tags[tag].tags)
+              //  tagarr.push(tags[tag].tags)
+                tagarr=tagarr.concat(tags[tag].tags)
             }
-
-            console.log("\n ++++++++++++ \n "+tagarr)
-            console.log("\n ++++++++++++ \n "+typeof(tagarr))
+            tagarr=helpers.mergeArrayUnique(tagarr)
+            //console.log("\n ++++++++++++ \n "+_.union(tagarr))
+            // console.log("\n ++++++++++++ \n "+typeof(tagarr))
 
             res.json(tagarr);
         });
