@@ -186,14 +186,6 @@ router.route('/')
                 notEmpty: true,
                 errorMessage: 'category is Required'
             },
-            // 'lat': {
-            //     notEmpty: true,
-            //     errorMessage: 'latitude is Required'
-            // },
-            // 'long':{
-            //     notEmpty: true,
-            //     errorMessage: 'longitude is Required'
-            // },
         });
         req.getValidationResult().then(function (result) {
             if (!result.isEmpty()) {

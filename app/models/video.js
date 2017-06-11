@@ -33,11 +33,11 @@ const VideoSchema = new Schema({
         //tags: [{type: Schema.Types.ObjectId, ref: "Tag"}],
         tags: [String],
         category: {type: Schema.Types.ObjectId, ref: "Category"},
-        latitude:{
+        lat:{
             type: String,
             // required: true
         },
-        longitude:{
+        long:{
             type: String,
             // required: true
         },
