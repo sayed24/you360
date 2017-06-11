@@ -11,7 +11,7 @@ const router = require('express').Router(),
     //pagination
     paginate = require('express-paginate'),
     //search 
-    mongooseApiQuery = require('mongoose-api-query'),
+    //mongooseApiQuery = require('mongoose-api-query'),
     multer = require('multer');
 
 const requireAuth = passport.authenticate('jwt', {session: false});
@@ -510,3 +510,16 @@ router.route('/:videoId/views')
         });
     });
 
+//get all user videos
+router.route('/user/:userId')
+    .get((req, res, next) => {
+        Video.paginate({owner:req.params.userId}, {page: req.query.page, limit: req.query.limit}, function (err, videos) {
+            if (err) {
+                res.status(422).json({
+                    success: false,
+                    message: err.message
+                });
+            }
+            res.json(videos);
+        });  
+    })
