@@ -7,7 +7,7 @@ const router = require('express').Router(),
     User = require('mongoose').model('User'),
     Video = require('mongoose').model('Video'),
     Category = require('mongoose').model('Category'),
-    Tag = require('mongoose').model('Tag'),
+    //Tag = require('mongoose').model('Tag'),
     //pagination
     paginate = require('express-paginate'),
     //search 
@@ -105,27 +105,51 @@ router.route('/stream')
 
 //SEARCH
 
-router.route('/search')
+// router.route('/search')
+//     .get((req, res, next) => {
+//         console.log(req.query)
+//         let q= req.query
+//         delete q['limit']
+//         delete q['page']
+//         Video.apiQuery(q, (err, videos) => {
+//             if (err) {
+//                 res.status(422).json({
+//                     success: false,
+//                     message: err.message
+//                 });
+//             }
+//             // console.log(typeof(videos))
+//             // if(!videos){
+//             //     return res.status(404).json({success: false, message: "Video Not found"})
+//             // }
+//             res.json(videos);
+//         })
+//     //end of get
+//     });
+
+
+//get all tags
+router.route('/tags')
     .get((req, res, next) => {
-        console.log(req.query)
-        let q= req.query
-        delete q['limit']
-        delete q['page']
-        Video.apiQuery(q, (err, videos) => {
+        Video.find({}, {tags:1,_id:0}, function (err, tags) {
             if (err) {
                 res.status(422).json({
                     success: false,
                     message: err.message
                 });
             }
-            // console.log(typeof(videos))
-            // if(!videos){
-            //     return res.status(404).json({success: false, message: "Video Not found"})
-            // }
-            res.json(videos);
-        })
-    //end of get
-    });
+            tagarr=[]
+            for(tag in tags){
+                console.log(tags[tag].tags)
+                tagarr.concat(tags[tag].tags)
+            }
+
+            console.log("\n ++++++++++++ \n "+tagarr)
+            console.log("\n ++++++++++++ \n "+typeof(tagarr))
+
+            res.json(tagarr);
+        });
+    })
 
 
 /*
@@ -146,7 +170,7 @@ router.route('/')
     })
     //Create New video
 
-    //TODO Add video uploader 
+    //TODO Add video uploader   
     .post((req, res, next) => {
         req.checkBody({
             notEmpty: true,
@@ -247,11 +271,12 @@ router.route('/')
 
             //res.json(video)
 
-            Video.create(video, (err, user) => {
+            Video.create(video, (err, video) => {
                 if (err) {
                     return res.status(422).json({success: false, message: err.message})
                 }
-                res.json({success: true, message: "video Added Successfully"})
+
+                res.json({success: true, message: "video Added Successfully",id: video._id})
             });
 
 
@@ -496,3 +521,4 @@ router.route('/:videoId/views')
             })
         });
     });
+

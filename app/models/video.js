@@ -30,7 +30,8 @@ const VideoSchema = new Schema({
             comment:{type: String},
             uid:{type: Schema.Types.ObjectId, ref: "User"}
         }],
-        tags: [{type: Schema.Types.ObjectId, ref: "Tag"}],
+        //tags: [{type: Schema.Types.ObjectId, ref: "Tag"}],
+        tags: [String],
         category: {type: Schema.Types.ObjectId, ref: "Category"},
         latitude:{
             type: String,
