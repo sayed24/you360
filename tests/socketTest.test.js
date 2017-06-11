@@ -20,7 +20,8 @@ const videoId = "59334fd7f25144336c3e4078"
 const comment = "hello. "
 
 describe('************* Socket Test *************',function(){
-	this.timeout(50000);
+
+	//this.timeout(50000);
 	/* Test 1 - User uploade new video.*/
 	it('Should broadcast new video',function(done){
 		//this.timeout(15000);
@@ -113,7 +114,7 @@ describe('************* Socket Test *************',function(){
 
 /* Test 3 - User dislike a video.*/
 	it('Should broadcast one of the videos disliked',function(done){
-		this.timeout(15000);
+		//this.timeout(15000);
 		let client1, client2, client3;
 		let count=0;
 		var checkvideoid = function(client){
@@ -154,7 +155,7 @@ describe('************* Socket Test *************',function(){
 
 	/* Test 4 - User views a video.*/
 	it('Should broadcast one of the videos viewed',function(done){
-		this.timeout(15000);
+		//this.timeout(15000);
 		let client1, client2, client3;
 		let count=0;
 		var checkvideoid = function(client){
@@ -195,7 +196,7 @@ describe('************* Socket Test *************',function(){
 
 	/* Test 5 - User commented on video.*/
 	it('Should broadcast new comment',function(done){
-		this.timeout(15000);
+		//this.timeout(15000);
 		let client1, client2, client3;
 		let count=0;
 		var checkvideoid = function(client){
