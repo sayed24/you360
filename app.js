@@ -2,7 +2,7 @@ var express = require('express'),
     config = require('./config/config'),
     glob = require('glob'),
     // socketEvents = require('./socketEvents'),
-	socketEvents = require('./app/controllers/sockio.js'),
+	socketEvents = require('./socketEvents'),
     mongoose = require('mongoose'),
     socketIO = require('socket.io');
 

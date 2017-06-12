@@ -2,7 +2,7 @@ const should = require('should');
 const request = require('supertest');
 const app = require('../app');
 const URI = require('./spec_helper').URI;
-const server = require('../app/controllers/sockio');
+const server = require('../socketEvents');
 var io = require('socket.io-client');
 
 var options ={
@@ -18,9 +18,23 @@ const User3 = { _id: '12345', password: 'secret', lastName: 'test', firstName: '
 
 const videoId = "59334fd7f25144336c3e4078"
 const comment = "hello. "
+// const video ={
+// 	"_id" : videoId,
+// 	"name" : "vi",
+// 	"description" : "test",
+// 	"filename" : "1dd",
+// 	"views" : 0,
+// 	"tags" : [ ],
+// 	"comments" : [ ],
+// 	"dislikes" : [ ],
+// 	"likes" : [ ],
+// 	"__v" : 0
+// }
+
 
 describe('************* Socket Test *************',function(){
-	this.timeout(50000);
+
+	//this.timeout(50000);
 	/* Test 1 - User uploade new video.*/
 	it('Should broadcast new video',function(done){
 		//this.timeout(15000);
@@ -30,8 +44,9 @@ describe('************* Socket Test *************',function(){
 			let client1, client2, client3;
 			let count=0;
 			var checkvideoid = function(client){
-				client.on('new video', function(vid){
-		        	vid.should.equal(videoId);
+				client.on('new video', function(video){
+					//console.log(video)
+		        	video["_id"].should.equal(videoId);
 		        	client.disconnect();
 		        	count++;
 		        	if(count === 3){
@@ -76,8 +91,8 @@ describe('************* Socket Test *************',function(){
 		let client1, client2, client3;
 		let count=0;
 		var checkvideoid = function(client){
-			client.on('increase likes', function(vid){
-	        	vid.should.equal(videoId);
+			client.on('increase likes', function(video){
+	        	video["_id"].should.equal(videoId);
 	        	client.disconnect();
 	        	count++;
 	        	if(count === 3){
@@ -113,12 +128,12 @@ describe('************* Socket Test *************',function(){
 
 /* Test 3 - User dislike a video.*/
 	it('Should broadcast one of the videos disliked',function(done){
-		this.timeout(15000);
+		//this.timeout(15000);
 		let client1, client2, client3;
 		let count=0;
 		var checkvideoid = function(client){
-			client.on('increase dislikes', function(vid){
-	        	vid.should.equal(videoId);
+			client.on('increase dislikes', function(video){
+	        	video["_id"].should.equal(videoId);
 	        	client.disconnect();
 	        	count++;
 	        	if(count === 3){
@@ -154,12 +169,12 @@ describe('************* Socket Test *************',function(){
 
 	/* Test 4 - User views a video.*/
 	it('Should broadcast one of the videos viewed',function(done){
-		this.timeout(15000);
+		//this.timeout(15000);
 		let client1, client2, client3;
 		let count=0;
 		var checkvideoid = function(client){
-			client.on('increase views', function(vid){
-	        	vid.should.equal(videoId);
+			client.on('increase views', function(video){
+	        	video["_id"].should.equal(videoId);
 	        	client.disconnect();
 	        	count++;
 	        	if(count === 3){
@@ -195,7 +210,7 @@ describe('************* Socket Test *************',function(){
 
 	/* Test 5 - User commented on video.*/
 	it('Should broadcast new comment',function(done){
-		this.timeout(15000);
+		//this.timeout(15000);
 		let client1, client2, client3;
 		let count=0;
 		var checkvideoid = function(client){

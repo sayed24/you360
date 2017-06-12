@@ -48,10 +48,20 @@ exports.saveFile=function saveFile(file){
     return name;
 }
 exports.removeFile=function removeFile(file){
-    let matches = file.match(/\/([^/]+)$/);
-    let path=process.cwd()+"/public/uploads/"+matches[1];
+    let path=process.cwd()+"/public/uploads/"+file;
     if (fs.existsSync(path)) {
         fs.unlink(path);
     }
 
 }
+exports.mergeArrayUnique = function mergeArrayUnique(array) {
+    var a = array.concat();
+    for(var i=0; i<a.length; ++i) {
+        for(var j=i+1; j<a.length; ++j) {
+            if(a[i] === a[j])
+                a.splice(j--, 1);
+        }
+    }
+
+    return a;
+};

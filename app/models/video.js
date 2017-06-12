@@ -1,9 +1,11 @@
-// Importing Node packages required for schema
+    // Importing Node packages required for schema
 const mongoose = require('mongoose');
 const helpers = require('../helpers');
 const Schema = mongoose.Schema;
 // pagination
 const mongoosePaginate = require('mongoose-paginate');
+//search 
+const mongooseApiQuery = require('mongoose-api-query');
 //= ===============================
 // Video Schema
 //= ===============================
@@ -28,13 +30,14 @@ const VideoSchema = new Schema({
             comment:{type: String},
             uid:{type: Schema.Types.ObjectId, ref: "User"}
         }],
-        tags: [{type: Schema.Types.ObjectId, ref: "Tag"}],
+        //tags: [{type: Schema.Types.ObjectId, ref: "Tag"}],
+        tags: [{type: String}],
         category: {type: Schema.Types.ObjectId, ref: "Category"},
-        latitude:{
+        lat:{
             type: String,
             // required: true
         },
-        longitude:{
+        long:{
             type: String,
             // required: true
         },
@@ -50,7 +53,7 @@ const VideoSchema = new Schema({
 VideoSchema.pre('remove', function (next) {
     // Remove all related docs
     helpers.removeFile(this.image);
-    next();su
+    next();
 });
 //= ===============================
 // Video ORM Methods
@@ -65,6 +68,9 @@ VideoSchema.pre('remove', function (next) {
  * pagination
 */
 VideoSchema.plugin(mongoosePaginate);
-
+/*
+ * Search
+*/
+VideoSchema.plugin(mongooseApiQuery);
 
 mongoose.model('Video', VideoSchema);

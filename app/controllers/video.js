@@ -7,9 +7,11 @@ const router = require('express').Router(),
     User = require('mongoose').model('User'),
     Video = require('mongoose').model('Video'),
     Category = require('mongoose').model('Category'),
-    Tag = require('mongoose').model('Tag'),
+    //Tag = require('mongoose').model('Tag'),
     //pagination
     paginate = require('express-paginate'),
+    //search 
+    //mongooseApiQuery = require('mongoose-api-query'),
     multer = require('multer');
 
 const requireAuth = passport.authenticate('jwt', {session: false});
@@ -24,7 +26,7 @@ module.exports = function (app) {
 var upload_video = multer({
     dest: "public/uploads",
     rename: function (fieldname, filename) {
-        return filename + Date.now();
+        return Math.round(Math.random()*10000000) +""+ +new Date();
     }
 }).single('video');
 router.get('/stream', (req, res, next) => {
@@ -70,6 +72,81 @@ router.post('/upload', function (req, res, next) {
     });
 });
 
+router.route('/stream')
+    .get((req, res, next) => {
+        let path = process.cwd()+"/public/pano.mp4";
+        let stat = fs.statSync(path);
+        let total = stat.size;
+        if (req.headers['range']) {
+            let range = req.headers.range;
+            let parts = range.replace(/bytes=/, "").split("-");
+            let partialstart = parts[0];
+            let partialend = parts[1];
+
+            let start = parseInt(partialstart, 10);
+            let end = partialend ? parseInt(partialend, 10) : total - 1;
+            let chunksize = (end - start) + 1;
+            console.log('RANGE: ' + start + ' - ' + end + ' = ' + chunksize);
+
+            let file = fs.createReadStream(path, { start: start, end: end });
+            res.writeHead(206, {
+                'Content-Range': 'bytes ' + start + '-' + end + '/' + total,
+                'Accept-Ranges': 'bytes',
+                'Content-Length': chunksize,
+                'Content-Type': 'video/mp4'
+            });
+            file.pipe(res);
+        } else {
+            console.log('ALL: ' + total);
+            res.writeHead(200, { 'Content-Length': total, 'Content-Type': 'video/mp4' });
+            fs.createReadStream(path).pipe(res);
+        }
+    });
+
+//SEARCH
+
+// router.route('/search')
+//     .get((req, res, next) => {
+//         console.log(req.query)
+//         let q= req.query
+//         delete q['limit']
+//         delete q['page']
+//         Video.apiQuery(q, (err, videos) => {
+//             if (err) {
+//                 res.status(422).json({
+//                     success: false,
+//                     message: err.message
+//                 });
+//             }
+//             // console.log(typeof(videos))
+//             // if(!videos){
+//             //     return res.status(404).json({success: false, message: "Video Not found"})
+//             // }
+//             res.json(videos);
+//         })
+//     //end of get
+//     });
+
+
+//get all tags
+router.route('/tags')
+    .get((req, res, next) => {
+        Video.find({}, {tags:1,_id:0}, function (err, tags) {
+            if (err) {
+                res.status(422).json({
+                    success: false,
+                    message: err.message
+                });
+            }
+            let tagarr=[]
+            for(tag in tags){
+                tagarr=tagarr.concat(tags[tag].tags)
+            }
+            tagarr=helpers.mergeArrayUnique(tagarr)
+            res.json(tagarr);
+        });
+    })
+
 
 /*
 * CRUD operations
@@ -89,7 +166,7 @@ router.route('/')
     })
     //Create New video
 
-    //TODO Add video uploader 
+    //TODO Add video uploader   
     .post((req, res, next) => {
         req.checkBody({
             notEmpty: true,
@@ -105,14 +182,6 @@ router.route('/')
                 notEmpty: true,
                 errorMessage: 'category is Required'
             },
-            // 'lat': {
-            //     notEmpty: true,
-            //     errorMessage: 'latitude is Required'
-            // },
-            // 'long':{
-            //     notEmpty: true,
-            //     errorMessage: 'longitude is Required'
-            // },
         });
         req.getValidationResult().then(function (result) {
             if (!result.isEmpty()) {
@@ -124,7 +193,10 @@ router.route('/')
             if (video.thumb) {
                 video.thumb = helpers.saveFile(video.thumb)
             }
-            video.filename = "filename_" + uuid.v1()
+            /*منك لله يامنار لفيت ساعتين وقعدت اغير ودوغت والاخر لقيتك انتا الى غيرتيه */
+
+            /*شكرا بس انا كنت قايلالك*/
+            // video.filename = "filename_" + uuid.v1()
             video.views = 0
             video.likes = []
             video.dislikes = []
@@ -187,11 +259,12 @@ router.route('/')
 
             //res.json(video)
 
-            Video.create(video, (err, user) => {
+            Video.create(video, (err, video) => {
                 if (err) {
                     return res.status(422).json({success: false, message: err.message})
                 }
-                res.json({success: true, message: "video Added Successfully"})
+
+                res.json({success: true, message: "video Added Successfully",id: video._id})
             });
 
 
@@ -228,7 +301,9 @@ router.route('/:videoId')
 
     //Delete video 
     .delete((req, res, next) => {
+        console.log("+++++++++++++++ \n"+req.params.videoId)
         Video.findOne({_id: req.params.videoId}, (err, video) => {
+
             if (err) {
                 return res.status(422).json({success: false, message: err.message})
             }
@@ -434,3 +509,17 @@ router.route('/:videoId/views')
             })
         });
     });
+
+//get all user videos
+router.route('/user/:userId')
+    .get((req, res, next) => {
+        Video.paginate({owner:req.params.userId}, {page: req.query.page, limit: req.query.limit}, function (err, videos) {
+            if (err) {
+                res.status(422).json({
+                    success: false,
+                    message: err.message
+                });
+            }
+            res.json(videos);
+        });  
+    })
