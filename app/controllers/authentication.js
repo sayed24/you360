@@ -36,6 +36,8 @@ router.post('/login', requireLogin, (req, res, next) => {
 })
 
 
+
+
 //= =======================================
 // Registration Route
 //= =======================================
@@ -198,8 +200,13 @@ router.post('/reset-password/:token', (req, res, next) => {
     });
 });
 // router.use(requireAuth);
-router.get('/protected', requireAuth, (req, res) => {
-    res.send({content: 'The protected test route is functional!'});
+router.get('/check', requireAuth, (req, res) => {
+    const userInfo = helpers.setUserInfo(req.user);
+    res.status(201).json({
+        status:"success",
+        token: `JWT ${generateToken(userInfo)}`,
+        user: userInfo
+    });
 });
 router.get('/admins-only', roleAuthorization(constsnts.ROLE_ADMIN), (req, res) => {
     res.send({content: 'Admin dashboard is working.'});

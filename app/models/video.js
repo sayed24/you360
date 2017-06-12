@@ -53,7 +53,7 @@ const VideoSchema = new Schema({
 VideoSchema.pre('remove', function (next) {
     // Remove all related docs
     helpers.removeFile(this.image);
-    next();su
+    next();
 });
 //= ===============================
 // Video ORM Methods
