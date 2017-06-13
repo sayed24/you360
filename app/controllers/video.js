@@ -76,7 +76,7 @@ router.post('/upload', function (req, res, next) {
 router.route('/')
 //Retrive all videos
     .get((req, res, next) => {
-        Video.paginate({}, {populate:'category',lean:true,page: req.query.page, limit: req.query.limit}, function (err, videos) {
+        Video.paginate({}, {populate:["category","owner","comments.uid"],lean:true,page: req.query.page, limit: req.query.limit}, function (err, videos) {
             if (err) {
                 res.status(422).json({
                     success: false,
@@ -143,7 +143,7 @@ router.route('/:videoId')
 
 ////Retrive video data
     .get((req, res, next) => {
-        let query = Video.findOne({_id: req.params.videoId}).populate("owner category");
+        let query = Video.findOne({_id: req.params.videoId}).populate("owner category comments.uid");
         query.lean().exec((err, video) => {
             if (err) {
                 return res.status(422).json({
