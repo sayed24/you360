@@ -7,11 +7,7 @@ const router = require('express').Router(),
     User = require('mongoose').model('User'),
     Video = require('mongoose').model('Video'),
     Category = require('mongoose').model('Category'),
-    //Tag = require('mongoose').model('Tag'),
-    //pagination
     paginate = require('express-paginate'),
-    //search 
-    //mongooseApiQuery = require('mongoose-api-query'),
     multer = require('multer');
 
 const requireAuth = passport.authenticate('jwt', {session: false});
@@ -26,10 +22,11 @@ module.exports = function (app) {
 var upload_video = multer({
     dest: "public/uploads",
     rename: function (fieldname, filename) {
-        return Math.round(Math.random()*10000000) +""+ +new Date();
+        return Math.round(Math.random() * 10000000) + "" + +new Date();
     }
 }).single('video');
-router.get('/stream', (req, res, next) => {
+router.get('/:videoId/stream', (req, res, next) => {
+
     let path = process.cwd() + "/public/pano.mp4";
     let stat = fs.statSync(path);
     let total = stat.size;
@@ -72,81 +69,6 @@ router.post('/upload', function (req, res, next) {
     });
 });
 
-router.route('/stream')
-    .get((req, res, next) => {
-        let path = process.cwd()+"/public/pano.mp4";
-        let stat = fs.statSync(path);
-        let total = stat.size;
-        if (req.headers['range']) {
-            let range = req.headers.range;
-            let parts = range.replace(/bytes=/, "").split("-");
-            let partialstart = parts[0];
-            let partialend = parts[1];
-
-            let start = parseInt(partialstart, 10);
-            let end = partialend ? parseInt(partialend, 10) : total - 1;
-            let chunksize = (end - start) + 1;
-            console.log('RANGE: ' + start + ' - ' + end + ' = ' + chunksize);
-
-            let file = fs.createReadStream(path, { start: start, end: end });
-            res.writeHead(206, {
-                'Content-Range': 'bytes ' + start + '-' + end + '/' + total,
-                'Accept-Ranges': 'bytes',
-                'Content-Length': chunksize,
-                'Content-Type': 'video/mp4'
-            });
-            file.pipe(res);
-        } else {
-            console.log('ALL: ' + total);
-            res.writeHead(200, { 'Content-Length': total, 'Content-Type': 'video/mp4' });
-            fs.createReadStream(path).pipe(res);
-        }
-    });
-
-//SEARCH
-
-// router.route('/search')
-//     .get((req, res, next) => {
-//         console.log(req.query)
-//         let q= req.query
-//         delete q['limit']
-//         delete q['page']
-//         Video.apiQuery(q, (err, videos) => {
-//             if (err) {
-//                 res.status(422).json({
-//                     success: false,
-//                     message: err.message
-//                 });
-//             }
-//             // console.log(typeof(videos))
-//             // if(!videos){
-//             //     return res.status(404).json({success: false, message: "Video Not found"})
-//             // }
-//             res.json(videos);
-//         })
-//     //end of get
-//     });
-
-
-//get all tags
-router.route('/tags')
-    .get((req, res, next) => {
-        Video.find({}, {tags:1,_id:0}, function (err, tags) {
-            if (err) {
-                res.status(422).json({
-                    success: false,
-                    message: err.message
-                });
-            }
-            let tagarr=[]
-            for(tag in tags){
-                tagarr=tagarr.concat(tags[tag].tags)
-            }
-            tagarr=helpers.mergeArrayUnique(tagarr)
-            res.json(tagarr);
-        });
-    })
-
 
 /*
 * CRUD operations
@@ -161,8 +83,15 @@ router.route('/')
                     message: err.message
                 });
             }
+            let docs = videos.docs;
+            docs = docs.map((video) => {
+                video.path = req.headers.host + '/uploads/' + video.filename;
+                video.thumb = req.headers.host + '/uploads/' + video.thumb;
+                return video;
+            })
+            videos.docs = docs;
             res.json(videos);
-        });
+        })
     })
     //Create New video
 
@@ -193,81 +122,18 @@ router.route('/')
             if (video.thumb) {
                 video.thumb = helpers.saveFile(video.thumb)
             }
-            /*منك لله يامنار لفيت ساعتين وقعدت اغير ودوغت والاخر لقيتك انتا الى غيرتيه */
-
-            /*شكرا بس انا كنت قايلالك*/
-            /*هههههههههه انتو جايين تشيتو هنا .. كل واحد على زنزانته*/
-            // video.filename = "filename_" + uuid.v1()
             video.views = 0
-            video.likes = []
-            video.dislikes = []
-            video.comments = []
-            console.log("-----------------------------------")
-            console.log(req.user)
-            console.log("-----------------------------------")
-
             video.owner = req.user._id
             //TODO add new tag
             if (!video.hasOwnProperty('tags')) {
                 video.tags = []
             }
-            //check if this category exist so put this id else create new one
-
-            // let query = Category.findOne({name: video.category});
-            // query.exec((err, category) => {
-            //     if (err) {
-            //         return res.status(422).json({
-            //             success: false,
-            //             message: err.message
-            //         });
-            //     }
-            //     if(!category){
-            //         // "category Not found" create new one
-            //         let categ={
-            //             "name": video.category
-            //         }
-            //         Category.create(categ, (err, cat) => {
-            //             if (err) {
-            //                 return res.status(422).json({success: false, message: err.message})
-            //             }
-            //             console.log("____________________")
-            //             console.log(cat)
-            //             console.log("____________________")
-            //             video.category = "ttt"//cat._id
-            //             let catid = cat._id
-
-            //         });
-            //         video.category = "123"
-            //         console.log("+++++++++++")
-            //         console.log(video.category)
-            //         console.log("++++++++++")
-            //        // video.category=catid
-            //     }
-            //     else{
-            //         console.log("///////////////")
-            //         console.log(category)
-            //         video.category=category._id
-            //     }
-            // });
-            // video.category= "yyyy"
-            ///Create tag
-            // else{
-            //     //Check if tags is array of ids or new objects
-
-            //     //check if this tag exist so put it in tags else create new one
-            // }
-
-
-            //res.json(video)
-
             Video.create(video, (err, video) => {
                 if (err) {
                     return res.status(422).json({success: false, message: err.message})
                 }
-
-                res.json({success: true, message: "video Added Successfully",id: video._id})
+                res.json({success: true, message: "video Added Successfully", id: video._id})
             });
-
 
         });
     });
@@ -293,18 +159,17 @@ router.route('/:videoId')
             else {
                 video.liked = false;
             }
-            console.log(req.user._id)
             video.likes = video.likes.length;
             video.dislikes = video.dislikes.length;
+            video.path = req.headers.host + '/uploads/' + video.filename;
+            video.thumb = req.headers.host + '/uploads/' + video.thumb;
             res.json(video);
         });
     })
 
     //Delete video 
     .delete((req, res, next) => {
-        console.log("+++++++++++++++ \n"+req.params.videoId)
         Video.findOne({_id: req.params.videoId}, (err, video) => {
-
             if (err) {
                 return res.status(422).json({success: false, message: err.message})
             }
@@ -334,37 +199,29 @@ router.route('/:videoId')
 //TODO Add play video link in gui
 
 //Comment CRUD
-router.route('/:videoId/comments')
-//create new comment
-    .post((req, res, next) => {
-        let commentinfo = req.body;
-        req.checkBody({
+router.post('/:videoId/comments', (req, res, next) => {
+    let commentinfo = req.body;
+    req.checkBody({
+        notEmpty: true,
+        'comment': {
             notEmpty: true,
-            'comment': {
-                notEmpty: true,
-                errorMessage: 'Comment is Required'
+            errorMessage: 'Comment is Required'
+        }
+    })
+    req.getValidationResult().then(function (result) {
+        if (!result.isEmpty()) {
+            res.status(422).json(result.useFirstErrorOnly().mapped());
+            return;
+        }
+        commentinfo.uid = req.user._id
+        Video.update({_id: req.params.videoId}, {"$push": {"comments": commentinfo}}, (err) => {
+            if (err) {
+                return res.status(422).json({success: false, message: err})
             }
-        })
-        req.getValidationResult().then(function (result) {
-            if (!result.isEmpty()) {
-                res.status(422).json(result.useFirstErrorOnly().mapped());
-                return;
-            }
-
-            commentinfo.uid = req.user._id
-            //console.log(commentinfo)
-            //check why each comment has _id
-            Video.update({_id: req.params.videoId}, {"$push": {"comments": commentinfo}}, (err) => {
-                if (err) {
-                    return res.status(422).json({success: false, message: err})
-                }
-                res.json({success: true, message: "Comment Added and video updated Successfully "})
-            });
-
-
+            res.json({success: true, message: "Comment Added and video updated Successfully "})
         });
-
     });
+});
 
 router.route('/:videoId/comments/:commentId')
     .delete((req, res, next) => {
@@ -437,90 +294,73 @@ router.route('/:videoId/comments/:commentId')
     });
 
 //video likes api
-router.route('/:videoId/likes')
-    .post((req, res, next) => {
-        Video.findOne({_id: req.params.videoId}, (err, video) => {
+router.post('/:videoId/like', (req, res, next) => {
+    Video.findOne({_id: req.params.videoId}, (err, video) => {
+        if (err) {
+            return res.status(422).json({success: false, message: err.message})
+        }
+        if (!video) {
+            return res.status(404).json({success: false, message: "video Not found"})
+        }
+        let uid = req.user._id
+        //Remove user id from dislikes array
+        Video.update({"$and": [{_id: req.params.videoId}, {"dislikes": {"$elemMatch": {"$eq": uid}}}]}, {"$pull": {dislikes: uid}}, (err) => {
             if (err) {
                 return res.status(422).json({success: false, message: err.message})
             }
-            if (!video) {
-                return res.status(404).json({success: false, message: "video Not found"})
-            }
-            let uid = req.user._id
-            //Remove user id from dislikes array
-            Video.update({"$and": [{_id: req.params.videoId}, {"dislikes": {"$elemMatch": {"$eq": uid}}}]}, {"$pull": {dislikes: uid}}, (err) => {
+            //add uid to like array
+            Video.update({_id: req.params.videoId}, {"$addToSet": {likes: uid}}, (err) => {
                 if (err) {
                     return res.status(422).json({success: false, message: err.message})
                 }
-                console.log("dislikeremoved")
-                //add uid to like array
-                Video.update({_id: req.params.videoId}, {"$addToSet": {likes: uid}}, (err) => {
-                    if (err) {
-                        return res.status(422).json({success: false, message: err.message})
-                    }
-                    res.json({success: true, message: "like added Successfully"})
-                })
+                res.json({success: true, message: "like added Successfully"})
             })
-        });
+        })
     });
+});
 
 //video dislikes api
-router.route('/:videoId/dislikes')
-    .post((req, res, next) => {
-        Video.findOne({_id: req.params.videoId}, (err, video) => {
+router.post('/:videoId/dislike', (req, res, next) => {
+    Video.findOne({_id: req.params.videoId}, (err, video) => {
+        if (err) {
+            return res.status(422).json({success: false, message: err.message})
+        }
+        if (!video) {
+            return res.status(404).json({success: false, message: "video Not found"})
+        }
+        let uid = req.user._id
+        //Remove user id from likes array
+        Video.update({"$and": [{_id: req.params.videoId}, {"likes": {"$elemMatch": {"$eq": uid}}}]}, {"$pull": {likes: uid}}, (err) => {
             if (err) {
                 return res.status(422).json({success: false, message: err.message})
             }
-            if (!video) {
-                return res.status(404).json({success: false, message: "video Not found"})
-            }
-            let uid = req.user._id
-            //Remove user id from likes array
-            Video.update({"$and": [{_id: req.params.videoId}, {"likes": {"$elemMatch": {"$eq": uid}}}]}, {"$pull": {likes: uid}}, (err) => {
+            console.log("likeremoved")
+            //add uid to dislike array
+            Video.update({_id: req.params.videoId}, {"$addToSet": {dislikes: uid}}, (err) => {
                 if (err) {
                     return res.status(422).json({success: false, message: err.message})
                 }
-                console.log("likeremoved")
-                //add uid to dislike array
-                Video.update({_id: req.params.videoId}, {"$addToSet": {dislikes: uid}}, (err) => {
-                    if (err) {
-                        return res.status(422).json({success: false, message: err.message})
-                    }
-                    res.json({success: true, message: "dislike added Successfully"})
-                })
+                res.json({success: true, message: "dislike added Successfully"})
             })
-        });
+        })
     });
+});
 
 //video views api
-router.route('/:videoId/views')
-    .post((req, res, next) => {
-        Video.findOne({_id: req.params.videoId}, (err, video) => {
+router.post('/:videoId/view', (req, res, next) => {
+    Video.findOne({_id: req.params.videoId}, (err, video) => {
+        if (err) {
+            return res.status(422).json({success: false, message: err.message})
+        }
+        if (!video) {
+            return res.status(404).json({success: false, message: "video Not found"})
+        }
+        Video.update({_id: req.params.videoId}, {"$inc": {views: 1}}, (err) => {
             if (err) {
                 return res.status(422).json({success: false, message: err.message})
             }
-            if (!video) {
-                return res.status(404).json({success: false, message: "video Not found"})
-            }
-            Video.update({_id: req.params.videoId}, {"$inc": {views: 1}}, (err) => {
-                if (err) {
-                    return res.status(422).json({success: false, message: err.message})
-                }
-                res.json({success: true, message: "view added Successfully"})
-            })
-        });
+            res.json({success: true, message: "view added Successfully"})
+        })
     });
+});
 
-//get all user videos
-router.route('/user/:userId')
-    .get((req, res, next) => {
-        Video.paginate({owner:req.params.userId}, {page: req.query.page, limit: req.query.limit,populate: "owner category"}, function (err, videos) {
-            if (err) {
-                res.status(422).json({
-                    success: false,
-                    message: err.message
-                });
-            }
-            res.json(videos);
-        });  
-    })
