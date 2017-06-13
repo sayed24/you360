@@ -196,6 +196,7 @@ router.route('/')
             /*منك لله يامنار لفيت ساعتين وقعدت اغير ودوغت والاخر لقيتك انتا الى غيرتيه */
 
             /*شكرا بس انا كنت قايلالك*/
+            /*هههههههههه انتو جايين تشيتو هنا .. كل واحد على زنزانته*/
             // video.filename = "filename_" + uuid.v1()
             video.views = 0
             video.likes = []
@@ -275,7 +276,7 @@ router.route('/:videoId')
 
 ////Retrive video data
     .get((req, res, next) => {
-        let query = Video.findOne({_id: req.params.videoId});
+        let query = Video.findOne({_id: req.params.videoId}).populate("owner category");
         query.lean().exec((err, video) => {
             if (err) {
                 return res.status(422).json({
@@ -513,7 +514,7 @@ router.route('/:videoId/views')
 //get all user videos
 router.route('/user/:userId')
     .get((req, res, next) => {
-        Video.paginate({owner:req.params.userId}, {page: req.query.page, limit: req.query.limit}, function (err, videos) {
+        Video.paginate({owner:req.params.userId}, {page: req.query.page, limit: req.query.limit,populate: "owner category"}, function (err, videos) {
             if (err) {
                 res.status(422).json({
                     success: false,

@@ -101,6 +101,7 @@ router.route('/:userId')
     })
     .put((req, res, next) => {
         let userdata = req.body;
+
         if (userdata.image) {
             userdata.image = helpers.saveFile(userdata.image);
         }
