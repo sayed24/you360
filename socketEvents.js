@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-function get_video_info(io, videoId, emitmsg) {
+function getVideo(io,socket, videoId, emitmsg) {
     let query = mongoose.model('Video').findOne({_id: videoId});
     query.lean().exec((err, video) => {
         if (err) {
@@ -11,6 +11,8 @@ function get_video_info(io, videoId, emitmsg) {
         }
         video.likes = video.likes.length;
         video.dislikes = video.dislikes.length;
+        video.path = socket.manager.server.hostname+"/uploads/"+video.filename;
+        video.thumb = socket.manager.server.hostname+"/uploads/"+video.thumb;
         io.sockets.in('online').emit(emitmsg, video);
     })
 }
@@ -79,19 +81,17 @@ exports = module.exports = function (io) {
             //brodcast new video id
             //get video info
 
-            get_video_info(io, videoId, 'new video')
+            getVideo(io, videoId, 'new video')
 
 
         });
         //event for like video
         socket.on('likes', (videoId) => {
-            get_video_info(io, videoId, 'increase likes')
-
-
+            getVideo(io,socket,videoId, 'increase likes')
         });
         //event for dislike video
         socket.on('dislikes', (videoId) => {
-            get_video_info(io, videoId, 'increase dislikes')
+            getVideo(io,socket, videoId, 'increase dislikes')
 
             //io.sockets.in('online').emit('increase dislikes', videoId);
         });
@@ -102,7 +102,7 @@ exports = module.exports = function (io) {
         });
         //event for video viewed
         socket.on('increase views count', (videoId) => {
-            get_video_info(io, videoId, 'increase views')
+            getVideo(io,socket, videoId, 'increase views')
             //io.sockets.in('online').emit('increase views', videoId);
         });
 
