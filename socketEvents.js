@@ -122,14 +122,28 @@ exports = module.exports = function (io) {
             });
         });
         //event for new comment added
-        socket.on('new comment', (comment) => {
-            //comment  = comment id -OR- comment body
-            io.sockets.in('online').emit('new comment', comment);
+        socket.on('new comment', (data) => {
+            mongoose.model('Video').findOne({_id: data.videoId}).populate('comments.uid').then((video)=> {
+                video.comments.push(data.comment);
+                video.save((err) => {
+                    if (err) {
+                        console.log(err.message)
+                    }
+                    io.sockets.in('online').emit(`${video._id}_comments`,video.comments);
+                });
+            });
         });
         //event for video viewed
-        socket.on('increase views count', (videoId) => {
-            getVideo(io,socket, videoId, 'increase views')
-            //io.sockets.in('online').emit('increase views', videoId);
+        socket.on('view video', (data) => {
+            mongoose.model('Video').findOne({_id:data.videoId}).then((video)=> {
+                video.views+=1;
+                video.save((err) => {
+                    if (err) {
+                        console.log(err.message)
+                    }
+                    io.sockets.in('online').emit(`${video._id}_views`,video.views);
+                });
+            });
         });
 
 

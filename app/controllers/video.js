@@ -225,7 +225,7 @@ router.post('/:videoId/comments', (req, res, next) => {
             if (err) {
                 return res.status(422).json({success: false, message: err})
             }
-            res.json({success: true, message: "Comment Added and video updated Successfully "})
+            res.json({success: true, message: "Comment Added and video updated Successfully"})
         });
     });
 });
