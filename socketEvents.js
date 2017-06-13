@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 function getVideo(io,socket, videoId, emitmsg) {
-    let query = mongoose.model('Video').findOne({_id: videoId});
+    let query = mongoose.model('Video').findOne({_id: videoId}).populate('category');
     query.lean().exec((err, video) => {
         if (err) {
            console.log(err.message);

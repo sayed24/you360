@@ -76,7 +76,7 @@ router.post('/upload', function (req, res, next) {
 router.route('/')
 //Retrive all videos
     .get((req, res, next) => {
-        Video.paginate({}, {page: req.query.page, limit: req.query.limit}, function (err, videos) {
+        Video.paginate({}, {populate:'category',lean:true,page: req.query.page, limit: req.query.limit}, function (err, videos) {
             if (err) {
                 res.status(422).json({
                     success: false,
