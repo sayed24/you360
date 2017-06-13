@@ -13,6 +13,7 @@ function getVideo(io,socket, videoId, emitmsg) {
         video.dislikes = video.dislikes.length;
         video.path = 'https://you360.herokuapp.com'+"/uploads/"+video.filename;
         video.thumb = 'https://you360.herokuapp.com'+"/uploads/"+video.thumb;
+        video.stream ='https://you360.herokuapp.com/api/videos/' + video._id +'/stream'
         io.sockets.in('online').emit(emitmsg, video);
     })
 }

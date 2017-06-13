@@ -86,6 +86,7 @@ router.route('/')
             let docs = videos.docs;
             docs = docs.map((video) => {
                 video.path = helpers.fullUrl(req,'/uploads/' + video.filename);
+                video.stream = helpers.fullUrl(req,'/api/videos/' + video._id +'/stream')
                 video.thumb = helpers.fullUrl(req,'/uploads/' + video.thumb);
                 return video;
             })
@@ -162,6 +163,7 @@ router.route('/:videoId')
             video.likes = video.likes.length;
             video.dislikes = video.dislikes.length;
             video.path = helpers.fullUrl(req,'/uploads/' + video.filename);
+            video.stream = helpers.fullUrl(req,'/api/videos/' + video._id +'/stream')
             video.thumb = helpers.fullUrl(req,'/uploads/' + video.thumb);
             res.json(video);
         });
