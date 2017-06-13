@@ -86,14 +86,16 @@ exports = module.exports = function (io) {
 
         });
         //event for like video
-        socket.on('likes', (videoId) => {
-            getVideo(io,socket,videoId, 'increase likes')
+        socket.on('like video', (videoId) => {
+            mongoose.model('Video').findOne({_id: videoId}).then((video)=> {
+                io.sockets.in('online').emit(`${videoId} likes`, video.likes.length);
+            });
         });
         //event for dislike video
-        socket.on('dislikes', (videoId) => {
-            getVideo(io,socket, videoId, 'increase dislikes')
-
-            //io.sockets.in('online').emit('increase dislikes', videoId);
+        socket.on('dislike video', (videoId) => {
+            mongoose.model('Video').findOne({_id: videoId}).then((video)=> {
+                io.sockets.in('online').emit(`${videoId} dislikes`, video.dislikes.length);
+            });
         });
         //event for new comment added
         socket.on('new comment', (comment) => {
