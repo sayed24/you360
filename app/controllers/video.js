@@ -76,7 +76,12 @@ router.post('/upload', function (req, res, next) {
 router.route('/')
 //Retrive all videos
     .get((req, res, next) => {
-        Video.paginate({}, {populate:["category","owner","comments.uid"],lean:true,page: req.query.page, limit: req.query.limit}, function (err, videos) {
+        Video.paginate({}, {
+            populate: ["category", "owner", "comments.uid"],
+            lean: true,
+            page: req.query.page,
+            limit: req.query.limit
+        }, function (err, videos) {
             if (err) {
                 res.status(422).json({
                     success: false,
@@ -85,9 +90,9 @@ router.route('/')
             }
             let docs = videos.docs;
             docs = docs.map((video) => {
-                video.path = helpers.fullUrl(req,'/uploads/' + video.filename);
-                video.stream = helpers.fullUrl(req,'/api/videos/' + video._id +'/stream')
-                video.thumb = helpers.fullUrl(req,'/uploads/' + video.thumb);
+                video.path = helpers.fullUrl(req, '/uploads/' + video.filename);
+                video.stream = helpers.fullUrl(req, '/api/videos/' + video._id + '/stream')
+                video.thumb = helpers.fullUrl(req, '/uploads/' + video.thumb);
                 return video;
             })
             videos.docs = docs;
@@ -162,9 +167,9 @@ router.route('/:videoId')
             }
             video.likes = video.likes.length;
             video.dislikes = video.dislikes.length;
-            video.path = helpers.fullUrl(req,'/uploads/' + video.filename);
-            video.stream = helpers.fullUrl(req,'/api/videos/' + video._id +'/stream')
-            video.thumb = helpers.fullUrl(req,'/uploads/' + video.thumb);
+            video.path = helpers.fullUrl(req, '/uploads/' + video.filename);
+            video.stream = helpers.fullUrl(req, '/api/videos/' + video._id + '/stream')
+            video.thumb = helpers.fullUrl(req, '/uploads/' + video.thumb);
             res.json(video);
         });
     })
@@ -306,17 +311,13 @@ router.post('/:videoId/like', (req, res, next) => {
         }
         let uid = req.user._id
         //Remove user id from dislikes array
-        Video.update({"$and": [{_id: req.params.videoId}, {"dislikes": {"$elemMatch": {"$eq": uid}}}]}, {"$pull": {dislikes: uid}}, (err) => {
+        video.likes.addToSet(uid);
+        video.dislikes.pull(uid);
+        video.save((err) => {
             if (err) {
                 return res.status(422).json({success: false, message: err.message})
             }
-            //add uid to like array
-            Video.update({_id: req.params.videoId}, {"$addToSet": {likes: uid}}, (err) => {
-                if (err) {
-                    return res.status(422).json({success: false, message: err.message})
-                }
-                res.json({success: true, message: "like added Successfully"})
-            })
+            return res.json({success: true, message: "you liked the video Successfully"})
         })
     });
 });
@@ -332,19 +333,14 @@ router.post('/:videoId/dislike', (req, res, next) => {
         }
         let uid = req.user._id
         //Remove user id from likes array
-        Video.update({"$and": [{_id: req.params.videoId}, {"likes": {"$elemMatch": {"$eq": uid}}}]}, {"$pull": {likes: uid}}, (err) => {
+        video.dislikes.addToSet(uid);
+        video.likes.pull(uid);
+        video.save((err) => {
             if (err) {
                 return res.status(422).json({success: false, message: err.message})
             }
-            console.log("likeremoved")
-            //add uid to dislike array
-            Video.update({_id: req.params.videoId}, {"$addToSet": {dislikes: uid}}, (err) => {
-                if (err) {
-                    return res.status(422).json({success: false, message: err.message})
-                }
-                res.json({success: true, message: "dislike added Successfully"})
-            })
-        })
+            return res.json({success: true, message: "you disliked the video Successfully"})
+        });
     });
 });
 
