@@ -68,9 +68,13 @@ exports.mergeArrayUnique = function mergeArrayUnique(array) {
 let url = require('url');
 
 exports.fullUrl=function fullUrl(req,path) {
+    let protocol = "http"
+    if(req.secure){
+        protocol="https"
+    }
     return url.format({
-        protocol: req.protocol,
-        host: req.get('host'),
+        protocol: protocol,
+        host: req.headers.host,
         pathname: path
     });
 }
