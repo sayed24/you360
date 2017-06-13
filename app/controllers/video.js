@@ -85,8 +85,8 @@ router.route('/')
             }
             let docs = videos.docs;
             docs = docs.map((video) => {
-                video.path = req.headers.host + '/uploads/' + video.filename;
-                video.thumb = req.headers.host + '/uploads/' + video.thumb;
+                video.path = helpers.fullUrl(req,'/uploads/' + video.filename);
+                video.thumb = helpers.fullUrl(req,'/uploads/' + video.thumb);
                 return video;
             })
             videos.docs = docs;
@@ -161,8 +161,8 @@ router.route('/:videoId')
             }
             video.likes = video.likes.length;
             video.dislikes = video.dislikes.length;
-            video.path = req.headers.host + '/uploads/' + video.filename;
-            video.thumb = req.headers.host + '/uploads/' + video.thumb;
+            video.path = helpers.fullUrl(req,'/uploads/' + video.filename);
+            video.thumb = helpers.fullUrl(req,'/uploads/' + video.thumb);
             res.json(video);
         });
     })

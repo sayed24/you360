@@ -11,8 +11,8 @@ function getVideo(io,socket, videoId, emitmsg) {
         }
         video.likes = video.likes.length;
         video.dislikes = video.dislikes.length;
-        video.path = socket.manager.server.hostname+"/uploads/"+video.filename;
-        video.thumb = socket.manager.server.hostname+"/uploads/"+video.thumb;
+        video.path = 'https://you360.herokuapp.com'+"/uploads/"+video.filename;
+        video.thumb = 'https://you360.herokuapp.com'+"/uploads/"+video.thumb;
         io.sockets.in('online').emit(emitmsg, video);
     })
 }
@@ -21,7 +21,6 @@ exports = module.exports = function (io) {
     let users = {};
     io.on('connection', (socket) => {
         console.log('a user connected');
-        //
         // On conversation entry, join broadcast channel
         socket.on('enter conversation', (conversation) => {
             socket.join(conversation);

@@ -65,3 +65,12 @@ exports.mergeArrayUnique = function mergeArrayUnique(array) {
 
     return a;
 };
+let url = require('url');
+
+exports.fullUrl=function fullUrl(req,path) {
+    return url.format({
+        protocol: req.protocol,
+        host: req.get('host'),
+        pathname: path
+    });
+}
