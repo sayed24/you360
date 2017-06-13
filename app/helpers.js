@@ -68,8 +68,8 @@ exports.mergeArrayUnique = function mergeArrayUnique(array) {
 let url = require('url');
 
 exports.fullUrl=function fullUrl(req,path) {
-    let protocol = "http"
-    if(req.secure){
+    let protocol = req.protocol
+    if(req.headers.host==="you360.herokuapp.com"){
         protocol="https"
     }
     return url.format({
