@@ -28,7 +28,7 @@ const VideoSchema = new Schema({
         //comments: [{type: Schema.Types.ObjectId, ref: "Comment"}],
         comments:[{
             comment:{type: String},
-            uid:{type: Schema.Types.ObjectId, ref: "User"}
+            owner:{type: Schema.Types.ObjectId, ref: "User"}
         }],
         //tags: [{type: Schema.Types.ObjectId, ref: "Tag"}],
         tags: [{type: String}],

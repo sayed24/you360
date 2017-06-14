@@ -276,7 +276,7 @@ router.route('/:videoId')
 
 ////Retrive video data
     .get((req, res, next) => {
-        let query = Video.findOne({_id: req.params.videoId}).populate("owner category");
+        let query = Video.findOne({_id: req.params.videoId}).populate("owner category comments.owner");
         query.lean().exec((err, video) => {
             if (err) {
                 return res.status(422).json({
@@ -351,7 +351,7 @@ router.route('/:videoId/comments')
                 return;
             }
 
-            commentinfo.uid = req.user._id
+            commentinfo.owner = req.user._id
             //console.log(commentinfo)
             //check why each comment has _id
             Video.update({_id: req.params.videoId}, {"$push": {"comments": commentinfo}}, (err) => {
