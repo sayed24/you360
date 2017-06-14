@@ -77,4 +77,11 @@ exports.fullUrl=function fullUrl(req,path) {
         host: req.headers.host,
         pathname: path
     });
+};
+
+exports.defaulter = function defaulter(value,returnValue,defaultValue) {
+    if(value === "" || typeof value === "undefined"){
+        return defaultValue;
+    }
+    return returnValue;
 }

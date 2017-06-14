@@ -157,8 +157,8 @@ router.get('/:userId/videos', (req, res, next) => {
         }
         let docs = videos.docs;
         docs = docs.map((video) => {
-            video.path = video.filename;
-            video.thumb = video.thumb;
+            video.path = helpers.fullUrl(req, '/uploads/' + video.filename);
+            video.thumb = helpers.defaulter(video.thumb,helpers.fullUrl(req, '/uploads/' + video.thumb),"");
             return video;
         })
         videos.docs = docs;
