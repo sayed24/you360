@@ -1,0 +1,9 @@
+[you360_deploy]
+45.33.38.90
+#localhost
+[all:vars]
+ansible_connection=ssh
+ansible_ssh_user=salama
+ansible_ssh_pass=Password123You360
+#TNO=$TRAVIS_BUILD_NUMBER
+#3#

@@ -1,0 +1,12 @@
+- name: Provision a you360 server "deploy"
+  hosts: all
+  remote_user: salama
+
+  become_user: root
+  roles:
+    - git
+#    - nginx
+    - mongodb
+    #- nodejs
+    - nodelatest
+    - clonerepo

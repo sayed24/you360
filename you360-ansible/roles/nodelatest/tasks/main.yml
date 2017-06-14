@@ -1,0 +1,15 @@
+---
+- name: Package prerequisites for node.js
+  action: apt pkg=python-software-properties state=installed update-cache=yes
+  tags:
+    - test_add
+
+- name: curl node repo
+  shell: sudo  curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+  tags:
+    - test_curl
+- name: install node
+  action: command sudo apt-get install -y nodejs
+
+- name: install build tools
+  action: command sudo apt-get install -y build-essential

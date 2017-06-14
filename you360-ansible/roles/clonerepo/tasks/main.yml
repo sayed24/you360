@@ -1,0 +1,54 @@
+---
+- name: clone repositories
+  git:
+     repo: 'https://github.com/sayed24/citest.git'
+     dest: /home/salama/you360
+     version: "{{ TNO }}"
+     force: yes
+  tags:
+     - test_clone
+
+- name: change owner
+  file:
+    path: /home/salama/you360
+    owner: salama
+    group: salama
+    mode: 0755
+    recurse: yes
+  tags:
+    - test_own
+
+# - name: Install packages based on package.json.
+#   npm:
+#     path: /home/salama/you360/
+#     global: yes
+#
+#   tags:
+#     - test_npm
+
+- name: ensure install
+  command: npm install -g /home/salama/you360/
+  tags:
+    - man
+
+# - name: start nodejs
+#   command: node /home/salama/you360/app.js &
+#   tags:
+#     - start_node
+
+- name: "Install forever (to run Node.js app)."
+  npm: name=forever global=yes state=present
+  tags:
+    - for
+- name: "Check list of Node.js apps running."
+  command: forever list
+  register: forever_list
+  changed_when: false
+  tags:
+    - check
+
+- name: "Start example Node.js app."
+  command: forever start /home/salama/you360/app.js
+  #when: "forever_list.stdout.find('/home/salama/you360/app.js') == -1"
+  tags:
+    - start
