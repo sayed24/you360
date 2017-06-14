@@ -3,58 +3,44 @@ node_js:
 - '7'
 sudo: required
 services:
-  - docker
+- docker
 before_install:
-  - sudo apt-get update
-  - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-engine
-  - sudo apt-get update -qq
-  - npm install
-  - sudo apt-get install sshpass
-
+- sudo apt-get update
+- sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-engine
+- sudo apt-get update -qq
+- npm install
+- sudo apt-get install sshpass
 install:
-  # Install Ansible.
-  - pip install ansible
-
-  # Add ansible.cfg to pick up roles path.
-  - sudo echo -e "[defaults]\nhost_key_checking = false" >> ansible.cfg
-  #- sudo cat /etc/ansible/ansible.cfg
+- pip install ansible
+- sudo echo -e "[defaults]\nhost_key_checking = false" >> ansible.cfg
 env:
   matrix:
   - NODE_ENV=test
   global:
   - COMMIT=${TRAVIS_COMMIT::8}
-  #- TNO=${TRAVIS_COMMIT}
   - secure: vX4Rgo6fOdXmK1Kjf3tpQK+DJ+mXwGafQqjY947/KIfYukBNkJ6PGx6Gf7Ttwv6h0NckfndpfypPUEMCdBGRD0RDbjqTiYrwMZSG/daUHHMTrNHA25X46VyOa+0jW37SmxpduZ7t4pLPQIKBMjPVB7WUgSvwLz1PF5ymmP9uhJ549ds4JprrtNZMYp3sNIRhPDoG/o4FWbB5KHaSuVwJ/TVC8EMohxn8E6TBoZEw8y5vEjQ91TStimpcuuXl5W1gWm/FXfN4TAUIaoED0aFTLrRQrDH+a6fKUB8sPKQff7AJG8BW/jAcoMZIqvfoebPdAMxglP5ENdKGqD9IjCsmFVxoiKPZOd8xcBOkz+MfuTs3y79GcQoRv69dC4kMI1SUWqTPO1CNLmIV9RmL2ojoc/Fi6XjhWapwNEjR6F36B6fYtxc3ya4WVf4yvd8xqea+IjkQTgODCZjeggvI5YzpREfXHTXrvn7gOH3bhM5TmavxEnE1IMGLKg0GQrqVWLT8Zi9v6bGru4kwC6wgnEqwO7zHM60rruaGDWk2vhKsQFF2kwj7S3jxMglCTseswocIiIKHavzcxjMg4zm1HYY+rkso/0Sdlm2cR1cJQ637kp8bguFrp1aSnDnurAyjUVukQrFfRdeeqKFD6cX7QkurGpPNWDRfo/orroB5rrQ7lDk=
   - secure: GnoOYtv8rZe9Fy4S3PKiAqBlTVlGJF8iiSzucC2jYcH5tiPdXyVcSki9gb16o33VF+UuWn1pLToCgT9XznICe15cM9Mf8iRJeO0mnfhE/z+bDgFtJwKYeG3NvnmdgRfRSoF3IcZL9vMRkhPdhH1MDJ+DaghR+khc/vdGFIXVzbPQZU1/o3zSneaxnUFZau1jO13/sQpjoWKnIZqD5HAa9QUHbbRA/T9pYL5sXFzzUbUcwT9+o9+KeJXizZp16+mNfwVkuDcCHrN6HuyqE4MyuX/ar4rsonOjVQ4S5XxsMfy4y37vmNwBrXEmnuCx93YXlergDtSII9HQPSlSAF8grafyaQ4ozRz3AhUAJw2NEWv8IoJ2NNH8Tmu0pSuZo0BqxkIge+wdSVOuEJqoJEDw5KkedGDt0iDsfRLCEs7QdiQ/WwEVaQDHwOr3c51JwQL1XGiIUj2D7CfcZX09qWeuN0WvZPyuxAxoRkVdwYAw1/HK/vPMqpYFeunFD9le1ealBHBHE1QNLZtEG1riDRXV41MKLSCKVHe68E0i5Mi0PPecKBUlO63G4+xPCcBdp2s0q4Xj49RP7Zp+QKQgSIrQPOUEWVuywSQFO5PL8VBHurb3xNj6rWNqj/pCd5aC3FYP26dYAzvVO707xACh28Idn91GCQdnM7aB3tCe+1JSDcc=
   - secure: lvYliRf4h692jL6YnTkkklIgm7VklE+l4fqeKWFfziSW6oN4/6p1MubCcO6JM2ZsvOgsaAnEd1vzlnecV+GizKuHQ7IxN6cICWcTdduiv9UORA+h6Akp6fdOcaWOUf1E3Ed6rgi/02g645u1nJQuqvjnzEfzbC8sCZr5D03CoOewvFUGWohfWt7TRdnk6oVmBcoANcNvuI+VL3Tpx1ytGMyajC/pNvvRaG/D3/ai/sT8ioRGnJ8UOdAKEYsFAoFL+DQ+HhNwWsty2tu2+AZBl4Yv9gBt6msPlamGVf36T4FmwxVARfQ4sLguDtQm8F51/JY/g2A1YZlw+OO48nMP9T3jKdU4CB8vlWS43tmYRUJZktBvWGX4LMNwgK2koKjHJAp+TBEEsIkz6qjzlg5uIdJdX100jSiJEGkL65N2Ay7g7yROgBAxG4AlFBl3HuPqlz7Fv0R1XABvVunmvQ/A7K4AVcD40zaj9BpN6WScApOCPJCiesxMW7lvnUvmhS0NU/86yLJnWm7e4y/muZi3Nn+NuYhGPTo1ymxqR+BYNjYpgU2SbgymokgVqmYz+S8QfcQpndHyhKE8YXCKW5M5Ms01s6tQHiYPLPOrzrt5xTVkppCyw6VGHvO/KITM87PY22OJrMoq3ob7/KdxUsQZRNnRwCTorqxXquv4cQyu+b8=
+after_success:
+- docker login -u="$DOCKER_USER" -p="$DOCKER_PASS"
+- export REPO=$DOCKER_USER/you360
+- export TNO=$TRAVIS_COMMIT
+- docker build -f Dockerfile -t $REPO:$COMMIT .
+- docker images
+- docker tag $REPO:$COMMIT $REPO:latest
+- docker tag $REPO:$COMMIT $REPO:travis-$TRAVIS_BUILD_NUMBER
+- docker rmi $REPO:$COMMIT
+- docker images
+- docker push $REPO
+- ansible-playbook you360-ansible/you360_playbook.yml -i you360-ansible/hosts -b --extra-vars
+  "TNO=$TRAVIS_BRANCH" -vvvv --flush-cache
 deploy:
   skip_cleanup: true
   provider: releases
   api_key:
-    #secure: tQbgBunYi/a2UjR71l8IQw8WMVGgiHoDjV7xZJFU3zh90nmArvROuS1iVTH5D5PO5hyZAvh/kfKo+XiK7pQNj1757fy6hP4SKFKiOB/IEg7/qwNHOvVUa8+3wgr/i74m6C2+M58kJYdfXgIjnaMSSn4pD5Ds+xdMUShWvtDeGuzkS9R+SlKsRKPP+a9qlJUfcXuzNn+P2ItXTivW3m2ss4wfx4HP4NYp36gA8Uf2FfilAU+EvGIgUBdMHlS9OEffhycdulGEPZN3PH3+JxSC7vZ4Y+lryFFXWRd9CI1rgV0v+u112M87j/45snGoh12f5Uen+W7ZwnmfKC0oSXa8t4ht1t14xB8mL9cb5BJSUy9UpyJnKcobDVJsz3VSNQdq8YoWtXRNCWn6epI/hv0TPv8Z2ddawLsfvXXOdgT4pfMpkmnqUSufdEkj0saKlMv789fXhtOzlSca277ZoSVIiou1a86OJ2ai0um8daU97ExYXI1/XxwqzGhLkPGRJtsxa6U0iuSIPuR/Jp6GBZZNuKC0Z93nlqf2o3cbBNVt6BWKBTzjj+iT41Ow9Sfp0O1jBKUSCoGTZpupTcOTbHl5EjQRs4F+8J69Eu6SJKgrrxd4H1NldqBJbhgiPJ8RbSi7qmXkggfRxCaBRsUPOMxiy0h/MMo3q4F/NmJmxePCovM=
-    secure: 0011c457da4c6633dae9d97a867d573b32066edf
-  file_glob: true
+    secure: PXPSeZdjAC86aa8iK6/jN6AHV+6Kd8nCJ7EVt35xrq8iKJOwtwG6TK6+dR897KtJ9M+YymARosdXIRzJhpoUxDKUWAcA1OJXfeq9XdfLlpITlfKFrxSQsWImApt25ZIFsAJnnk72T6hqxoAgvO0ZFYEn2OiB0wPO5QZWBqsgp5+NxKStSJ0SgMsyuHLNMs00vJsP08K8zgbyh1YeP5lO1wrRX+jxZOAmtkIXGimmOHXLV6PlFQv9QwgJe2tBjr1n102asjg7exGMVomHFFEXbJ0X+7Aa3pS/w4qnFBlSjp3tawnDHY6MouQ9quq6NKwXb2zXzW9jILolTnge91E8HQH3f1x5FDwNkVjMzkMHLzSAxP1TKxEfPSw2Yg3qjlGGVzvRgBpbdgN2N02Z3Pl4FsXHEDGejeCMts+SoT9jJjB6rgqvEgEmPbVpxRsYgmMtPsF2SSaIUjbrxE1/QPaGnCNt2DmHRt3mRrM4go3yP40fVyiybnB4k4ZO7Ru4xFUxvql/plOqWU6ZW7QYf6tlaegDumPRXO+ZDjuV8jHKKPTN+7vN4APZ3D8eIfcWpnGh2swSQrfQYXiVuNGwrKK2RTo069YVAhSjtPHOWD82J6U5ZD5YzHHM4yBsgIwzYBZHnoafHxawC6KqtCUycjVM9rYXX3wpOKPBXbRIyY+fgp0=
   file: you360/*
+  file_glob: true
   on:
     repo: sayed24/you360
     tags: true
-after_success:
-
-
-      - docker login -u="$DOCKER_USER" -p="$DOCKER_PASS"
-      - export REPO=$DOCKER_USER/you360
-      - export TNO=$TRAVIS_COMMIT
-      # - docker build -f Dockerfile -t $DOCKER_USER/testimg:latest .
-      # - docker images
-      # # - docker tag testimg $DOCKER_USERNAME/testimg
-      # - docker push $DOCKER_USER/testimg
-      # - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
-      - docker build -f Dockerfile -t $REPO:$COMMIT .
-      - docker images
-      - docker tag $REPO:$COMMIT $REPO:latest
-      - docker tag $REPO:$COMMIT $REPO:travis-$TRAVIS_BUILD_NUMBER
-      - docker rmi $REPO:$COMMIT
-      - docker images
-      - docker push $REPO
-      ########
-      - ansible-playbook you360-ansible/you360_playbook.yml -i you360-ansible/hosts -b --extra-vars "TNO=$TRAVIS_BRANCH" -vvvv --flush-cache
