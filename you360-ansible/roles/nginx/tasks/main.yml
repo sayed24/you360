@@ -8,10 +8,10 @@
     - test_ng
 
 - name: Copy defaults
- become: yes
- template:
-   src=default
-   dest=/etc/nginx/sites-available/
- notify: reload nginx
- tags:
-   - test_copy
+  become: yes
+  template:
+    src=default
+    dest=/etc/nginx/sites-available/
+  notify: reload nginx
+  tags:
+    - test_copy
