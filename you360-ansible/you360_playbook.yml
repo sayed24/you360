@@ -10,3 +10,4 @@
     #- nodejs
     - nodelatest
     - clonerepo
+    - nginx
