@@ -3,12 +3,12 @@ const router = require('express').Router(),
     fs = require('fs'),
     helpers = require('../helpers'),
     config = require('../../config/config'),
-    User = require('mongoose').model('User');
+    User = require('mongoose').model('User'),
+    Video = require('mongoose').model('Video');
 const requireAuth = passport.authenticate('jwt', {session: false});
 /*
 * pagination
 */
-const mongoosePaginate = require('mongoose-paginate');
 const paginate = require('express-paginate')
 
 router.use(paginate.middleware(10, 50));
@@ -17,7 +17,7 @@ router.use(paginate.middleware(10, 50));
 module.exports = function (app) {
 
     app.use('/api/users', router);
-    
+
 };
 router.use(requireAuth);
 
@@ -26,7 +26,7 @@ router.use(requireAuth);
 //= =======================================
 router.route('/')
     .get((req, res, next) => {
-        User.paginate({}, { page: req.query.page, limit: req.query.limit }, function(err, users) {
+        User.paginate({}, {page: req.query.page, limit: req.query.limit}, function (err, users) {
             if (err) {
                 res.status(422).json({
                     success: false,
@@ -34,7 +34,7 @@ router.route('/')
                 });
             }
             res.json(users);
-           });
+        });
 
     })
     .post((req, res, next) => {
@@ -92,7 +92,7 @@ router.route('/:userId')
                     message: err.message
                 });
             }
-            if(!user){
+            if (!user) {
                 return res.status(404).json({success: false, message: "User Not found"})
             }
             res.json(user);
@@ -117,7 +117,7 @@ router.route('/:userId')
             if (err) {
                 return res.status(422).json({success: false, message: err.message})
             }
-            if(!user){
+            if (!user) {
                 return res.status(404).json({success: false, message: "User Not found"})
             }
             user.remove((err) => {
@@ -136,10 +136,32 @@ router.get('/:userId/notifications', (req, res, next) => {
         if (err) {
             return res.status(422).json({success: false, message: err})
         }
-        if(!user){
+        if (!user) {
             return res.status(404).json({success: false, message: "User Not found"})
         }
-        let notification=user.notifications.filter(notification=>notification.seen==false);
+        let notification = user.notifications.filter(notification => notification.seen == false);
         res.json(notification);
     })
 });
+router.get('/:userId/videos', (req, res, next) => {
+    Video.paginate({owner: req.params.userId}, {
+        page: req.query.page,
+        limit: req.query.limit,
+        populate: "owner category"
+    }, function (err, videos) {
+        if (err) {
+            res.status(422).json({
+                success: false,
+                message: err.message
+            });
+        }
+        let docs = videos.docs;
+        docs = docs.map((video) => {
+            video.path = video.filename;
+            video.thumb = video.thumb;
+            return video;
+        })
+        videos.docs = docs;
+        res.json(videos);
+    });
+})

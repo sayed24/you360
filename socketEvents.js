@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
-function get_video_info(io, videoId, emitmsg) {
-    let query = mongoose.model('Video').findOne({_id: videoId});
+function getVideo(io,socket, videoId, emitmsg) {
+    let query = mongoose.model('Video').findOne({_id: videoId}).populate('category');
     query.lean().exec((err, video) => {
         if (err) {
            console.log(err.message);
@@ -11,6 +11,9 @@ function get_video_info(io, videoId, emitmsg) {
         }
         video.likes = video.likes.length;
         video.dislikes = video.dislikes.length;
+        video.path = 'https://you360.herokuapp.com'+"/uploads/"+video.filename;
+        video.thumb = 'https://you360.herokuapp.com'+"/uploads/"+video.thumb;
+        video.stream ='https://you360.herokuapp.com/api/videos/' + video._id +'/stream'
         io.sockets.in('online').emit(emitmsg, video);
     })
 }
@@ -18,8 +21,8 @@ exports = module.exports = function (io) {
     // Set socket.io listeners.
     let users = {};
     io.on('connection', (socket) => {
+        socket.join('online');
         console.log('a user connected');
-        //
         // On conversation entry, join broadcast channel
         socket.on('enter conversation', (conversation) => {
             socket.join(conversation);
@@ -32,7 +35,11 @@ exports = module.exports = function (io) {
             users[user._id] = socket;
             mongoose.model('User').findOne({_id: user._id}).then((user) => {
                 user.online = true
-                user.save()
+                user.save((err)=>{
+                    if(err){
+                        console.log(err.message)
+                    }
+                })
             }).catch((error) => {
                 console.log(error.message);
             });
@@ -79,31 +86,64 @@ exports = module.exports = function (io) {
             //brodcast new video id
             //get video info
 
-            get_video_info(io, videoId, 'new video')
+            getVideo(io,socket, videoId, 'new video')
 
 
         });
         //event for like video
-        socket.on('likes', (videoId) => {
-            get_video_info(io, videoId, 'increase likes')
+        socket.on('like video', (data) => {
+            mongoose.model('Video').findOne({_id: data.videoId}).then((video)=> {
 
-
+                video.likes.addToSet(data.userId);
+                video.dislikes.pull(data.userId);
+                video.save((err) => {
+                    if (err) {
+                        console.log(err.message)
+                    }
+                    io.sockets.in('online').emit(`${data.videoId}_likes`, {likes:video.likes.length,dislikes:video.dislikes.length});
+                });
+            });
         });
         //event for dislike video
-        socket.on('dislikes', (videoId) => {
-            get_video_info(io, videoId, 'increase dislikes')
+        socket.on('dislike video', (data) => {
+            mongoose.model('Video').findOne({_id: data.videoId}).then((video)=> {
+                video.dislikes.addToSet(data.userId);
+                video.likes.pull(data.userId);
+                video.save((err) => {
+                    if (err) {
+                       console.log(err.message)
+                    }
+                    console.log(`${video._id} dislikes`)
+                    console.log(video.likes);
+                    console.log(video.dislikes);
 
-            //io.sockets.in('online').emit('increase dislikes', videoId);
+                    io.sockets.in('online').emit(`${video._id}_dislikes`, {likes:video.likes.length,dislikes:video.dislikes.length});
+                });
+            });
         });
         //event for new comment added
-        socket.on('new comment', (comment) => {
-            //comment  = comment id -OR- comment body
-            io.sockets.in('online').emit('new comment', comment);
+        socket.on('new comment', (data) => {
+            mongoose.model('Video').findOne({_id: data.videoId}).populate('comments.uid').then((video)=> {
+                video.comments.push(data.comment);
+                video.save((err) => {
+                    if (err) {
+                        console.log(err.message)
+                    }
+                    io.sockets.in('online').emit(`${video._id}_comments`,video.comments);
+                });
+            });
         });
         //event for video viewed
-        socket.on('increase views count', (videoId) => {
-            get_video_info(io, videoId, 'increase views')
-            //io.sockets.in('online').emit('increase views', videoId);
+        socket.on('view video', (data) => {
+            mongoose.model('Video').findOne({_id:data.videoId}).then((video)=> {
+                video.views+=1;
+                video.save((err) => {
+                    if (err) {
+                        console.log(err.message)
+                    }
+                    io.sockets.in('online').emit(`${video._id}_views`,video.views);
+                });
+            });
         });
 
 

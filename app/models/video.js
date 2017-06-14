@@ -22,6 +22,10 @@ const VideoSchema = new Schema({
             lowercase: true,
             unique: true,
         },
+        path: {
+            type: String,
+            default:""
+        },
         views: {type: Number},
         likes: [{type: Schema.Types.ObjectId, ref: "User"}],
         dislikes: [{type: Schema.Types.ObjectId, ref: "User"}],
@@ -58,8 +62,6 @@ VideoSchema.pre('remove', function (next) {
 //= ===============================
 // Video ORM Methods
 //= ===============================
-
-
 //= ===============================
 // User ORM Virtuals
 //= ===============================
