@@ -1,7 +1,7 @@
 ---
 - name: clone repositories
   git:
-     repo: 'https://github.com/sayed24/citest.git'
+     repo: 'https://github.com/sayed24/you360.git'
      dest: /home/salama/you360
      version: "{{ TNO }}"
      force: yes
