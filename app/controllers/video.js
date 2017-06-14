@@ -80,7 +80,8 @@ router.route('/')
             populate: ["category", "owner", "comments.owner"],
             lean: true,
             page: req.query.page,
-            limit: req.query.limit
+            limit: req.query.limit,
+            sort: req.query.sort,
         }, function (err, videos) {
             if (err) {
                 res.status(422).json({
