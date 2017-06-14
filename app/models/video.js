@@ -22,13 +22,17 @@ const VideoSchema = new Schema({
             lowercase: true,
             unique: true,
         },
+        path: {
+            type: String,
+            default:""
+        },
         views: {type: Number},
         likes: [{type: Schema.Types.ObjectId, ref: "User"}],
         dislikes: [{type: Schema.Types.ObjectId, ref: "User"}],
         //comments: [{type: Schema.Types.ObjectId, ref: "Comment"}],
         comments:[{
             comment:{type: String},
-            uid:{type: Schema.Types.ObjectId, ref: "User"}
+            owner:{type: Schema.Types.ObjectId, ref: "User"}
         }],
         //tags: [{type: Schema.Types.ObjectId, ref: "Tag"}],
         tags: [{type: String}],
@@ -53,13 +57,11 @@ const VideoSchema = new Schema({
 VideoSchema.pre('remove', function (next) {
     // Remove all related docs
     helpers.removeFile(this.image);
-    next();su
+    next();
 });
 //= ===============================
 // Video ORM Methods
 //= ===============================
-
-
 //= ===============================
 // User ORM Virtuals
 //= ===============================

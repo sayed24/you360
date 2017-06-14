@@ -65,3 +65,23 @@ exports.mergeArrayUnique = function mergeArrayUnique(array) {
 
     return a;
 };
+let url = require('url');
+
+exports.fullUrl=function fullUrl(req,path) {
+    let protocol = req.protocol
+    if(req.headers.host==="you360.herokuapp.com"){
+        protocol="https"
+    }
+    return url.format({
+        protocol: protocol,
+        host: req.headers.host,
+        pathname: path
+    });
+};
+
+exports.defaulter = function defaulter(value,returnValue,defaultValue) {
+    if(value === "" || typeof value === "undefined"){
+        return defaultValue;
+    }
+    return returnValue;
+}

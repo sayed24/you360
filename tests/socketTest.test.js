@@ -2,7 +2,7 @@ const should = require('should');
 const request = require('supertest');
 const app = require('../app');
 const URI = require('./spec_helper').URI;
-const server = require('../app/controllers/sockio');
+const server = require('../socketEvents');
 var io = require('socket.io-client');
 
 var options ={
