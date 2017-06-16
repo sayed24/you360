@@ -68,6 +68,16 @@ VideoSchema.pre('remove', function (next) {
 // User ORM Virtuals
 //= ===============================
 
+// Pre-delete of video to database,
+VideoSchema.pre('remove', function (next) {
+    // Remove related file
+    helpers.removeFile(this.filename);
+    next();
+    
+
+});
+
+
 /*
  * pagination
 */

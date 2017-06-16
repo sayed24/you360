@@ -80,7 +80,8 @@ router.route('/')
             populate: ["category", "owner", "comments.uid"],
             lean: true,
             page: req.query.page,
-            limit: req.query.limit
+            limit: req.query.limit,
+            sort: req.query.sort,
         }, function (err, videos) {
             if (err) {
                 res.status(422).json({
@@ -93,6 +94,12 @@ router.route('/')
                 video.path = helpers.fullUrl(req, '/uploads/' + video.filename);
                 video.stream = helpers.fullUrl(req, '/api/videos/' + video._id + '/stream')
                 video.thumb = helpers.defaulter(video.thumb,helpers.fullUrl(req, '/uploads/' + video.thumb),"");
+                if (video.likes.toString().includes(String(req.user._id))) {
+                    video.liked = true;
+                }
+                else {
+                    video.liked = false;
+                }
                 return video;
             })
             videos.docs = docs;
@@ -145,10 +152,10 @@ router.route('/')
     });
 
 router.route('/:videoId')
-
+    
 ////Retrive video data
     .get((req, res, next) => {
-
+        console.log(req.user._id)
         let query = Video.findOne({_id: req.params.videoId}).populate("owner category comments.owner");
 
         query.lean().exec((err, video) => {
@@ -161,7 +168,8 @@ router.route('/:videoId')
             if (!video) {
                 return res.status(404).json({success: false, message: "Video Not found"})
             }
-            if (video.likes.includes(req.user._id)) {
+            if (video.likes.toString().includes(String(req.user._id))) {
+
                 video.liked = true;
             }
             else {
@@ -304,6 +312,7 @@ router.route('/:videoId/comments/:commentId')
 
 //video likes api
 router.post('/:videoId/like', (req, res, next) => {
+
     Video.findOne({_id: req.params.videoId}, (err, video) => {
         if (err) {
             return res.status(422).json({success: false, message: err.message})

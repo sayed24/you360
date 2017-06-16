@@ -21,13 +21,7 @@ exports = module.exports = function (io) {
     // Set socket.io listeners.
     let users = {};
     io.on('connection', (socket) => {
-        socket.join('online');
-        console.log('a user connected');
-        // On conversation entry, join broadcast channel
-        socket.on('enter conversation', (conversation) => {
-            socket.join(conversation);
-            // console.log('joined ' + conversation);
-        });
+        //socket.join('online');
 
         socket.on('login', (user) => {
             socket.join('online');
@@ -54,11 +48,7 @@ exports = module.exports = function (io) {
              });
             delete users[socket.userId];
         });
-        socket.on('leave conversation', (conversation) => {
-            socket.leave(conversation);
-            // console.log('left ' + conversation);
-        });
-
+       
         socket.on('new message', (conversation) => {
             io.sockets.in(conversation).emit('refresh messages', conversation);
         });
@@ -84,7 +74,6 @@ exports = module.exports = function (io) {
         //event for upload new video
         socket.on('new video created', (videoId) => {
             //brodcast new video id
-            //get video info
 
             getVideo(io,socket, videoId, 'new video')
 
@@ -118,7 +107,7 @@ exports = module.exports = function (io) {
         });
         //event for new comment added
         socket.on('new comment', (data) => {
-            mongoose.model('Video').findOne({_id: data.videoId}).populate('comments.uid').then((video)=> {
+            mongoose.model('Video').findOne({_id: data.videoId}).populate('comments.owner').then((video)=> {
                 video.comments.push(data.comment);
                 video.save((err) => {
                     if (err) {
