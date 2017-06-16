@@ -21,7 +21,7 @@ exports = module.exports = function (io) {
     // Set socket.io listeners.
     let users = {};
     io.on('connection', (socket) => {
-        //socket.join('online');
+        socket.join('online');
 
         socket.on('login', (user) => {
             socket.join('online');
