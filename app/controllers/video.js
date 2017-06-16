@@ -77,7 +77,7 @@ router.route('/')
 //Retrive all videos
     .get((req, res, next) => {
         Video.paginate({}, {
-            populate: ["category", "owner", "comments.owner"],
+            populate: ["category", "owner", "comments.uid"],
             lean: true,
             page: req.query.page,
             limit: req.query.limit

@@ -93,7 +93,6 @@ exports = module.exports = function (io) {
         //event for like video
         socket.on('like video', (data) => {
             mongoose.model('Video').findOne({_id: data.videoId}).then((video)=> {
-
                 video.likes.addToSet(data.userId);
                 video.dislikes.pull(data.userId);
                 video.save((err) => {
@@ -113,10 +112,6 @@ exports = module.exports = function (io) {
                     if (err) {
                        console.log(err.message)
                     }
-                    console.log(`${video._id} dislikes`)
-                    console.log(video.likes);
-                    console.log(video.dislikes);
-
                     io.sockets.in('online').emit(`${video._id}_dislikes`, {likes:video.likes.length,dislikes:video.dislikes.length});
                 });
             });
