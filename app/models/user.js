@@ -83,10 +83,10 @@ UserSchema.pre('save', function (next) {
 UserSchema.pre('remove', function (next) {
     // Remove all related docs
     helpers.removeFile(this.image);
-    this.model('Notification').remove({to: this._id}, (err) => {
-        if (err) return next(err);
-        next();
-    });
+    // this.model('Notification').remove({to: this._id}, (err) => {
+    //     if (err) return next(err);
+         next();
+    // });
 
 });
 // Method to compare password for login
@@ -102,11 +102,11 @@ UserSchema.methods.comparePassword = function (candidatePassword, cb) {
 //= ===============================
 // User ORM Virtuals
 //= ===============================
-UserSchema.virtual('notifications', {
-    ref: 'Notification', // The model to use
-    localField: '_id', // Find people where `localField`
-    foreignField: 'to' // is equal to `foreignField`
-});
+// UserSchema.virtual('notifications', {
+//     ref: 'Notification', // The model to use
+//     localField: '_id', // Find people where `localField`
+//     foreignField: 'to' // is equal to `foreignField`
+// });
 
 /*
  * pagination

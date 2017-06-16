@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+
 function getVideo(io,socket, videoId, emitmsg) {
     let query = mongoose.model('Video').findOne({_id: videoId}).populate('category');
     query.lean().exec((err, video) => {
@@ -37,6 +38,7 @@ exports = module.exports = function (io) {
             }).catch((error) => {
                 console.log(error.message);
             });
+
         });
         socket.on('logout', () => {
             socket.leave('online');
@@ -112,7 +114,7 @@ exports = module.exports = function (io) {
         });
         //event for new comment added
         socket.on('new comment', (data) => {
-            mongoose.model('Video').findOne({_id: data.videoId}).populate('comments.owner').then((video)=> {
+            mongoose.model('Video').findOne({_id: data.videoId}).populate('comments.owner').then((videos)=> {
                 video.comments.push(data.comment);
                 video.save((err) => {
                     if (err) {
@@ -135,6 +137,30 @@ exports = module.exports = function (io) {
             });
         });
 
+        // get app statistics
+        // socket.on ('statistics',() =>{
+        //     let videos_count =0;
+        //     let users_count =0;
+            
+        //     mongoose.model('Category').count({}).then((ucount)=> {
+        //         users_count = ucount
+        //         console.log('U Count is ' + users_count);
+        //     }).catch((error) => {
+        //         console.log(error.message);
+        //     });
+
+        //     mongoose.model('Video').count({}, function(err, count) {
+        //         if (err) {
+        //             console.log(err.message)
+        //         }
+        //         videos_count = count
+        //         console.log('V Count is ' + videos_count);
+        //     });
+        //     console.log("test++++++++++++++++"+users_count)
+            
+        //    // console.log('U Count is ' + users_count);
+
+        // });
 
         socket.on('disconnect', () => {
 

@@ -46,6 +46,18 @@ const VideoSchema = new Schema({
             // required: true
         },
         owner: {type: Schema.Types.ObjectId, ref: "User"},
+        copyRightOwner: [{
+            name:{type: String},
+            email:{
+                type: String,
+                lowercase: true,
+                unique: true
+            },
+            lastOwnerReported:{
+                type: Boolean,
+                default: true
+            },
+        }],
         thumb: {type: String},
 
     },

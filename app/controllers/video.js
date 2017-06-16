@@ -100,6 +100,9 @@ router.route('/')
                 else {
                     video.liked = false;
                 }
+
+                //TODO Add violated flage to returned video 
+
                 return video;
             })
             videos.docs = docs;
@@ -137,7 +140,6 @@ router.route('/')
             }
             video.views = 0
             video.owner = req.user._id
-            //TODO add new tag
             if (!video.hasOwnProperty('tags')) {
                 video.tags = []
             }
@@ -154,6 +156,9 @@ router.route('/')
 router.route('/:videoId')
     
 ////Retrive video data
+
+//TODO Add violated flage to returned video 
+
     .get((req, res, next) => {
         console.log(req.user._id)
         let query = Video.findOne({_id: req.params.videoId}).populate("owner category comments.owner");
