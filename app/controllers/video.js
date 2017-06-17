@@ -495,5 +495,50 @@ router.put('/:videoId/report/approved',(req, res, next) => {
     });
 
 router.get('/:videoId/recommended', (req, res, next) => {
-
+    Video.findOne({_id: req.params.videoId}, (err, video) => {
+        if (err) {
+            return res.status(422).json({success: false, message: err.message})
+        }
+        if (!video) {
+            return res.status(404).json({success: false, message: "video Not found"})
+        }
+        let vtags = video.tags;
+        Video.paginate({_id: {$ne: req.params.videoId},tags: {$in:vtags}}, {
+            populate: ["category", "owner", "comments.uid"],
+            lean: true,
+            page: req.query.page,
+            limit: req.query.limit,
+            sort: req.query.sort,
+        }, (err, videos) => {
+            if (err) {
+                res.status(422).json({
+                    success: false,
+                    message: err.message
+                });
+            }
+            let docs = videos.docs;
+            docs = docs.map((video) => {
+                video.path = helpers.fullUrl(req, '/uploads/' + video.filename);
+                video.stream = helpers.fullUrl(req, '/api/videos/' + video._id + '/stream')
+                video.thumb = helpers.defaulter(video.thumb,helpers.fullUrl(req, '/uploads/' + video.thumb),"");
+                if (video.likes.toString().includes(String(req.user._id))) {
+                    video.liked = true;
+                }
+                else {
+                    video.liked = false;
+                }
+                // violated video
+                if(video.violated){
+                    for(let i=0;i<video.copyRightOwner.length;i++){ 
+                        if(video.copyRightOwner[i].lastOwnerReported){
+                            video.copyRightOwner = video.copyRightOwner[i]
+                        }
+                    }
+                }
+                return video;
+            })
+            videos.docs = docs;
+            res.json(videos);
+        })
+    })
 })
