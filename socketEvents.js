@@ -76,10 +76,7 @@ exports = module.exports = function (io) {
         //event for upload new video
         socket.on('new video created', (videoId) => {
             //brodcast new video id
-
             getVideo(io,socket, videoId, 'new video')
-
-
         });
         //event for like video
         socket.on('like video', (data) => {
@@ -133,15 +130,26 @@ exports = module.exports = function (io) {
         });
 
         //get app statistics
-        socket.on ('get users count',() =>{
-             mongoose.model('User').count({}, function(err, count) {
+        socket.on ('statistics',() =>{
+            mongoose.model('User').count({}, function(err, count) {
                 if (err) {
                     console.log(err.message)
                 }
                 io.sockets.in('online').emit('users count',count)
             })
+            mongoose.model('Video').count({}, function(err, count) {
+                if (err) {
+                    console.log(err.message)
+                }
+                io.sockets.in('online').emit('videos count',count)
+            })
+            mongoose.model('Video').count({violated:true}, function(err, count) {
+                if (err) {
+                    console.log(err.message)
+                }
+                io.sockets.in('online').emit('violated videos count',count)
+            })
         })
-        
 
         socket.on('disconnect', () => {
 
