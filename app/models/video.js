@@ -58,6 +58,14 @@ const VideoSchema = new Schema({
                 default: true
             },
         }],
+        reported:{
+            type: Boolean,
+            default: false
+        },
+        violated:{
+            type: Boolean,
+            default: false
+        },
         thumb: {type: String},
 
     },

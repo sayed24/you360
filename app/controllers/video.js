@@ -109,9 +109,7 @@ router.route('/')
             res.json(videos);
         })
     })
-    //Create New video
-
-    //TODO Add video uploader   
+    //Create New video  
     .post((req, res, next) => {
         req.checkBody({
             notEmpty: true,
@@ -140,6 +138,7 @@ router.route('/')
             }
             video.views = 0
             video.owner = req.user._id
+            //video.copyRightOwner = []
             if (!video.hasOwnProperty('tags')) {
                 video.tags = []
             }
@@ -378,3 +377,67 @@ router.post('/:videoId/view', (req, res, next) => {
     });
 });
 
+// report api
+router.post('/:videoId/report', (req, res, next) => {
+    req.checkBody({
+        'email': {
+            notEmpty: true,
+            isEmail: {
+                errorMessage: 'Invalid Email'
+            },
+            errorMessage: 'Email is Required'
+        },
+        'name': {
+            notEmpty: true,
+            errorMessage: 'Name is Required'
+        }
+    })
+    req.getValidationResult().then(function (result) {
+        if (!result.isEmpty()) {
+            res.status(422).json(result.useFirstErrorOnly().mapped());
+            return;
+        }
+        Video.findOne({_id: req.params.videoId}, (err, video) => {
+            if (err) {
+                return res.status(422).json({success: false, message: err.message})
+            }
+            if (!video) {
+                return res.status(404).json({success: false, message: "video Not found"})
+            }
+            
+            let copyRightOwner_date = req.body
+            //check  if there is copy right before
+            if(video.copyRightOwner.length != 0){
+                //check  if copy right is exist before 
+                //video.copyRightOwner.map((cr)=>{
+                for (let i=0;i < video.copyRightOwner.length; i++){
+                    if(copyRightOwner_date.email == video.copyRightOwner[i].email || copyRightOwner_date.name == video.copyRightOwner[i].name){
+                      // return res.status(422).json({success: false, message: "This Copy rigth added before"})
+                       return res.json({success: true, message: "This Copy rigth added before"})
+                    }
+                }
+                // new copy right
+                // new copy right make all lastOwnerReported is false
+                video.copyRightOwner.map((cr)=>{
+                    cr.lastOwnerReported = false;
+                    return cr;
+                })
+                //add new copy right owner
+                console.log("new ++ "+ video.copyRightOwner)
+            }  
+            else{
+                // first report make video reported
+                video.reported = true       
+            }
+
+            //add new copy right owner
+            video.copyRightOwner.push(copyRightOwner_date)
+            video.save((err) => {
+                if (err) {
+                    return res.status(422).json({success: false, message: err.message})
+                }
+                res.json({success: true, message: "Copy rigth added Successfully and send report to admin"})
+            })
+        })
+    })
+})
