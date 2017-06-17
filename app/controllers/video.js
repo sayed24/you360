@@ -100,7 +100,14 @@ router.route('/')
                 else {
                     video.liked = false;
                 }
-
+                // violated video
+                if(video.violated){
+                    for(let i=0;i<video.copyRightOwner.length;i++){ 
+                        if(video.copyRightOwner[i].lastOwnerReported){
+                            video.copyRightOwner = video.copyRightOwner[i]
+                        }
+                    }
+                }
                 return video;
             })
             videos.docs = docs;
@@ -486,3 +493,7 @@ router.put('/:videoId/report/approved',(req, res, next) => {
             res.json({success: true, message: "Video violated Successfully"})
         });
     });
+
+router.get('/:videoId/recommended', (req, res, next) => {
+
+})
