@@ -132,30 +132,16 @@ exports = module.exports = function (io) {
             });
         });
 
-        // get app statistics
-        // socket.on ('statistics',() =>{
-        //     let videos_count =0;
-        //     let users_count =0;
-            
-        //     mongoose.model('Category').count({}).then((ucount)=> {
-        //         users_count = ucount
-        //         console.log('U Count is ' + users_count);
-        //     }).catch((error) => {
-        //         console.log(error.message);
-        //     });
-
-        //     mongoose.model('Video').count({}, function(err, count) {
-        //         if (err) {
-        //             console.log(err.message)
-        //         }
-        //         videos_count = count
-        //         console.log('V Count is ' + videos_count);
-        //     });
-        //     console.log("test++++++++++++++++"+users_count)
-            
-        //    // console.log('U Count is ' + users_count);
-
-        // });
+        //get app statistics
+        socket.on ('get users count',() =>{
+             mongoose.model('User').count({}, function(err, count) {
+                if (err) {
+                    console.log(err.message)
+                }
+                io.sockets.in('online').emit('users count',count)
+            })
+        })
+        
 
         socket.on('disconnect', () => {
 
