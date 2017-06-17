@@ -26,6 +26,7 @@ exports = module.exports = function (io) {
 
         socket.on('login', (user) => {
             socket.join('online');
+            
             socket.userId = user._id;
             users[user._id] = socket;
             mongoose.model('User').findOne({_id: user._id}).then((user) => {

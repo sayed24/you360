@@ -214,6 +214,14 @@ router.route('/:videoId')
             video.path = helpers.fullUrl(req, '/uploads/' + video.filename);
             video.stream = helpers.fullUrl(req, '/api/videos/' + video._id + '/stream')
             video.thumb = helpers.defaulter(video.thumb,helpers.fullUrl(req, '/uploads/' + video.thumb),"");
+            // violated video
+            if(video.violated){
+                for(let i=0;i<video.copyRightOwner.length;i++){ 
+                    if(video.copyRightOwner[i].lastOwnerReported){
+                        video.copyRightOwner = video.copyRightOwner[i]
+                    }
+                }
+            }
             res.json(video);
         });
     })
@@ -439,7 +447,6 @@ router.post('/:videoId/report', (req, res, next) => {
             //check  if there is copy right before
             if(video.copyRightOwner.length != 0){
                 //check  if copy right is exist before 
-                //video.copyRightOwner.map((cr)=>{
                 for (let i=0;i < video.copyRightOwner.length; i++){
                     if(copyRightOwner_date.email == video.copyRightOwner[i].email || copyRightOwner_date.name == video.copyRightOwner[i].name){
                       // return res.status(422).json({success: false, message: "This Copy rigth added before"})
@@ -455,11 +462,8 @@ router.post('/:videoId/report', (req, res, next) => {
                 //add new copy right owner
                 console.log("new ++ "+ video.copyRightOwner)
             }  
-            else{
-                // first report make video reported
-                video.reported = true       
-            }
-
+            // first report OR new report ==>  make video reported
+            video.reported = true       
             //add new copy right owner
             video.copyRightOwner.push(copyRightOwner_date)
             video.save((err) => {
