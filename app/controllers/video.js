@@ -101,8 +101,6 @@ router.route('/')
                     video.liked = false;
                 }
 
-                //TODO Add violated flage to returned video 
-
                 return video;
             })
             videos.docs = docs;
@@ -152,11 +150,43 @@ router.route('/')
         });
     });
 
+router.get('/reported',(req, res, next) => {
+        Video.paginate({reported:true}, {
+            populate: ["category", "owner", "comments.uid"],
+            lean: true,
+            page: req.query.page,
+            limit: req.query.limit,
+            sort: req.query.sort,
+        }, function (err, videos) {
+            if (err) {
+                res.status(422).json({
+                    success: false,
+                    message: err.message
+                });
+            }
+            let docs = videos.docs;
+            docs = docs.map((video) => {
+                video.path = helpers.fullUrl(req, '/uploads/' + video.filename);
+                video.stream = helpers.fullUrl(req, '/api/videos/' + video._id + '/stream')
+                video.thumb = helpers.defaulter(video.thumb,helpers.fullUrl(req, '/uploads/' + video.thumb),"");
+                if (video.likes.toString().includes(String(req.user._id))) {
+                    video.liked = true;
+                }
+                else {
+                    video.liked = false;
+                }
+
+                return video;
+            })
+            videos.docs = docs;
+            res.json(videos);
+        })
+});
+    
 router.route('/:videoId')
     
 ////Retrive video data
 
-//TODO Add violated flage to returned video 
 
     .get((req, res, next) => {
         console.log(req.user._id)
@@ -217,7 +247,6 @@ router.route('/:videoId')
             res.json({success: true, message: "Video Updated Successfully"})
         });
     });
-//TODO Add play video link in gui
 
 //Comment CRUD
 router.post('/:videoId/comments', (req, res, next) => {
@@ -378,6 +407,7 @@ router.post('/:videoId/view', (req, res, next) => {
 });
 
 // report api
+
 router.post('/:videoId/report', (req, res, next) => {
     req.checkBody({
         'email': {
@@ -439,6 +469,6 @@ router.post('/:videoId/report', (req, res, next) => {
                 res.json({success: true, message: "Copy rigth added Successfully and send report to admin"})
             })
         })
-    })
-})
+    });
+});
 
