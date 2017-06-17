@@ -187,7 +187,7 @@ router.route('/:videoId')
     
 ////Retrive video data
 
-
+//TODO Add check if video is violated -yes-> return copy right owner data
     .get((req, res, next) => {
         console.log(req.user._id)
         let query = Video.findOne({_id: req.params.videoId}).populate("owner category comments.owner");
@@ -472,3 +472,13 @@ router.post('/:videoId/report', (req, res, next) => {
     });
 });
 
+router.put('/:videoId/report/approved',(req, res, next) => {
+        //update violated -> true
+        //update report -> false
+        Video.update({_id: req.params.videoId}, {"$set": {violated:true,reported:false}}, (err) => {
+            if (err) {
+                return res.status(422).json({success: false, message: err})
+            }
+            res.json({success: true, message: "Video violated Successfully"})
+        });
+    });
