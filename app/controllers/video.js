@@ -95,7 +95,8 @@ router.route('/')
                 video.stream = helpers.fullUrl(req, '/api/videos/' + video._id + '/stream')
                 video.thumb = helpers.defaulter(video.thumb,helpers.fullUrl(req, '/uploads/' + video.thumb),"");
                 // get if user liked this video or not
-                video.liked = helpers.isliked(video.likes,video.dislikes,req.user._id)
+                video.liked = helpers.isuserinarray(video.likes,req.user._id)
+                video.disliked = helpers.isuserinarray(video.dislikes,req.user._id)
                 // violated video
                 if(video.violated){
                     for(let i=0;i<video.copyRightOwner.length;i++){ 
@@ -173,7 +174,8 @@ router.get('/reported',(req, res, next) => {
                 video.stream = helpers.fullUrl(req, '/api/videos/' + video._id + '/stream')
                 video.thumb = helpers.defaulter(video.thumb,helpers.fullUrl(req, '/uploads/' + video.thumb),"");
                 // get if user liked this video or not
-                video.liked = helpers.isliked(video.likes,video.dislikes,req.user._id)
+                video.liked = helpers.isuserinarray(video.likes,req.user._id)
+                video.disliked = helpers.isuserinarray(video.dislikes,req.user._id)
                 return video;
             })
             videos.docs = docs;
@@ -201,7 +203,8 @@ router.route('/:videoId')
                 return res.status(404).json({success: false, message: "Video Not found"})
             }
             // get if user liked this video or not
-            video.liked = helpers.isliked(video.likes,video.dislikes,req.user._id)
+            video.liked = helpers.isuserinarray(video.likes,req.user._id)
+            video.disliked = helpers.isuserinarray(video.dislikes,req.user._id)
             
             video.likes = video.likes.length;
             video.dislikes = video.dislikes.length;
@@ -509,7 +512,9 @@ router.get('/:videoId/recommended', (req, res, next) => {
                 video.stream = helpers.fullUrl(req, '/api/videos/' + video._id + '/stream')
                 video.thumb = helpers.defaulter(video.thumb,helpers.fullUrl(req, '/uploads/' + video.thumb),"");
                 // get if user liked this video or not
-                video.liked = helpers.isliked(video.likes,video.dislikes,req.user._id)
+                video.liked = helpers.isuserinarray(video.likes,req.user._id)
+                video.disliked = helpers.isuserinarray(video.dislikes,req.user._id)
+
                 // violated video
                 if(video.violated){
                     for(let i=0;i<video.copyRightOwner.length;i++){ 
