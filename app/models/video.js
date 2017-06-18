@@ -4,8 +4,7 @@ const helpers = require('../helpers');
 const Schema = mongoose.Schema;
 // pagination
 const mongoosePaginate = require('mongoose-paginate');
-//search 
-const mongooseApiQuery = require('mongoose-api-query');
+
 //= ===============================
 // Video Schema
 //= ===============================
@@ -106,9 +105,5 @@ VideoSchema.pre('remove', function (next) {
  * pagination
 */
 VideoSchema.plugin(mongoosePaginate);
-/*
- * Search
-*/
-VideoSchema.plugin(mongooseApiQuery);
 
 mongoose.model('Video', VideoSchema);

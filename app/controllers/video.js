@@ -26,34 +26,36 @@ var upload_video = multer({
     }
 }).single('video');
 router.get('/:videoId/stream', (req, res, next) => {
+    Video.findOne({_id:req.params.videoId},(video)=>{
+        let path = process.cwd() + `/public/uploads/${video.filename}`;
+        let stat = fs.statSync(path);
+        let total = stat.size;
+        if (req.headers['range']) {
+            let range = req.headers.range;
+            let parts = range.replace(/bytes=/, "").split("-");
+            let partialstart = parts[0];
+            let partialend = parts[1];
 
-    let path = process.cwd() + "/public/pano.mp4";
-    let stat = fs.statSync(path);
-    let total = stat.size;
-    if (req.headers['range']) {
-        let range = req.headers.range;
-        let parts = range.replace(/bytes=/, "").split("-");
-        let partialstart = parts[0];
-        let partialend = parts[1];
+            let start = parseInt(partialstart, 10);
+            let end = partialend ? parseInt(partialend, 10) : total - 1;
+            let chunksize = (end - start) + 1;
+            console.log('RANGE: ' + start + ' - ' + end + ' = ' + chunksize);
 
-        let start = parseInt(partialstart, 10);
-        let end = partialend ? parseInt(partialend, 10) : total - 1;
-        let chunksize = (end - start) + 1;
-        console.log('RANGE: ' + start + ' - ' + end + ' = ' + chunksize);
+            let file = fs.createReadStream(path, {start: start, end: end});
+            res.writeHead(206, {
+                'Content-Range': 'bytes ' + start + '-' + end + '/' + total,
+                'Accept-Ranges': 'bytes',
+                'Content-Length': chunksize,
+                'Content-Type': 'video/mp4'
+            });
+            file.pipe(res);
+        } else {
+            console.log('ALL: ' + total);
+            res.writeHead(200, {'Content-Length': total, 'Content-Type': 'video/mp4'});
+            fs.createReadStream(path).pipe(res);
+        }
+    })
 
-        let file = fs.createReadStream(path, {start: start, end: end});
-        res.writeHead(206, {
-            'Content-Range': 'bytes ' + start + '-' + end + '/' + total,
-            'Accept-Ranges': 'bytes',
-            'Content-Length': chunksize,
-            'Content-Type': 'video/mp4'
-        });
-        file.pipe(res);
-    } else {
-        console.log('ALL: ' + total);
-        res.writeHead(200, {'Content-Length': total, 'Content-Type': 'video/mp4'});
-        fs.createReadStream(path).pipe(res);
-    }
 });
 
 
@@ -77,7 +79,7 @@ router.route('/')
 //Retrive all videos
     .get((req, res, next) => {
         Video.paginate({}, {
-            populate: ["category", "owner", "comments.uid"],
+            populate: ["category", "owner", "comments.owner"],
             lean: true,
             page: req.query.page,
             limit: req.query.limit,
@@ -156,7 +158,7 @@ router.route('/')
 
 router.get('/reported',(req, res, next) => {
         Video.paginate({reported:true}, {
-            populate: ["category", "owner", "comments.uid"],
+            populate: ["category", "owner", "comments.owner"],
             lean: true,
             page: req.query.page,
             limit: req.query.limit,
@@ -488,7 +490,7 @@ router.put('/:videoId/report/approved',(req, res, next) => {
         });
     });
 
-router.get('/:videoId/recommended', (req, res, next) => {
+router.get('/:videoId/similar', (req, res, next) => {
     Video.findOne({_id: req.params.videoId}, (err, video) => {
         if (err) {
             return res.status(422).json({success: false, message: err.message})
@@ -498,7 +500,7 @@ router.get('/:videoId/recommended', (req, res, next) => {
         }
         let vtags = video.tags;
         Video.paginate({_id: {$ne: req.params.videoId},tags: {$in:vtags}}, {
-            populate: ["category", "owner", "comments.uid"],
+            populate: ["category", "owner", "comments.owner"],
             lean: true,
             page: req.query.page,
             limit: req.query.limit,
@@ -518,7 +520,6 @@ router.get('/:videoId/recommended', (req, res, next) => {
                 // get if user liked this video or not
                 video.liked = helpers.isuserinarray(video.likes,req.user._id)
                 video.disliked = helpers.isuserinarray(video.dislikes,req.user._id)
-
                 // violated video
                 if(video.violated){
                     for(let i=0;i<video.copyRightOwner.length;i++){ 
