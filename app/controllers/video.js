@@ -205,7 +205,7 @@ router.route('/:videoId')
             // get if user liked this video or not
             video.liked = helpers.isuserinarray(video.likes,req.user._id)
             video.disliked = helpers.isuserinarray(video.dislikes,req.user._id)
-            
+
             video.likes = video.likes.length;
             video.dislikes = video.dislikes.length;
             video.path = helpers.fullUrl(req, '/uploads/' + video.filename);
@@ -425,6 +425,10 @@ router.post('/:videoId/report', (req, res, next) => {
         'name': {
             notEmpty: true,
             errorMessage: 'Name is Required'
+        },
+        'description':{
+            notEmpty: true,
+            errorMessage: 'Description is Required'   
         }
     })
     req.getValidationResult().then(function (result) {

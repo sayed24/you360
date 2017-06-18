@@ -53,6 +53,10 @@ const VideoSchema = new Schema({
                 lowercase: true,
                 unique: true
             },
+            description:{
+                type: String,
+                lowercase: true
+            },
             lastOwnerReported:{
                 type: Boolean,
                 default: true
