@@ -85,3 +85,15 @@ exports.defaulter = function defaulter(value,returnValue,defaultValue) {
     }
     return returnValue;
 }
+
+exports.isliked = function isliked(likesArray,disLikesArray,userid){
+    let liked= null
+    // get if user liked this video or not
+    if (likesArray.toString().includes(String(userid))) {
+        liked = true;
+    }
+    else if(disLikesArray.toString().includes(String(userid))) {
+        liked = false;
+    }
+    return liked
+}
