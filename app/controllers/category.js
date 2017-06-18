@@ -1,6 +1,9 @@
 const router = require('express').Router(),
 	passport = require('passport'),
+    helpers = require('../helpers'),
+    config = require('../../config/config'),
 	Category = require('mongoose').model('Category'),
+    Video = require('mongoose').model('Video');
 	//pagination
     mongoosePaginate = require('mongoose-paginate'),
     paginate = require('express-paginate');
@@ -100,4 +103,25 @@ router.route('/:categoryId')
         });
     });
 
-
+router.get('/:categoryId/videos', (req, res, next) => {
+    Video.paginate({category: req.params.categoryId}, {
+        page: req.query.page,
+        limit: req.query.limit,
+        populate: "owner category"
+    }, function (err, videos) {
+        if (err) {
+            res.status(422).json({
+                success: false,
+                message: err.message
+            });
+        }
+        let docs = videos.docs;
+        docs = docs.map((video) => {
+            video.path = helpers.fullUrl(req, '/uploads/' + video.filename);
+            video.thumb = helpers.defaulter(video.thumb,helpers.fullUrl(req, '/uploads/' + video.thumb),"");
+            return video;
+        })
+        videos.docs = docs;
+        res.json(videos);
+    });
+})
