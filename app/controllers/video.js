@@ -26,8 +26,14 @@ var upload_video = multer({
     }
 }).single('video');
 router.get('/:videoId/stream', (req, res, next) => {
-    Video.findOne({_id:req.params.videoId},(video)=>{
-        let path = process.cwd() + `/public/uploads/${video.filename}`;
+    Video.findOne({_id:req.params.videoId},(err,video)=>{
+        let path = ''
+        if(video.filename){
+            path = process.cwd() + `/public/uploads/${video.filename}`;
+        }else{
+            return res.status(404).json("file not found")
+        }
+        console.log(path);
         let stat = fs.statSync(path);
         let total = stat.size;
         if (req.headers['range']) {
