@@ -15,12 +15,12 @@ const ReportSchema = new Schema({
         },
         email: {
             type: String,
-            lowercase: true,
-            unique: true,
+            lowercase: true
         },
         description: {
             type: String,
         },
+        approved:{type:Boolean,default:false}
     },
     {
         toJSON: {virtuals: true},

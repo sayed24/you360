@@ -1,11 +1,11 @@
 const router = require('express').Router(),
     passport = require('passport'),
-    uuid = require('uuid'),
     fs = require('fs'),
     helpers = require('../helpers'),
     config = require('../../config/config'),
     User = require('mongoose').model('User'),
     Video = require('mongoose').model('Video'),
+    Report = require('mongoose').model('Report'),
     Category = require('mongoose').model('Category'),
     paginate = require('express-paginate'),
     multer = require('multer');
@@ -79,7 +79,7 @@ router.route('/')
 //Retrive all videos
     .get((req, res, next) => {
         Video.paginate({}, {
-            populate: ["category", "owner", "comments.owner"],
+            populate: ["category", "owner", "comments.owner","copyrights"],
             lean: true,
             page: req.query.page,
             limit: req.query.limit,
@@ -99,14 +99,6 @@ router.route('/')
                 // get if user liked this video or not
                 video.liked = helpers.isuserinarray(video.likes,req.user._id)
                 video.disliked = helpers.isuserinarray(video.dislikes,req.user._id)
-                // violated video
-                if(video.violated){
-                    for(let i=0;i<video.copyRightOwner.length;i++){ 
-                        if(video.copyRightOwner[i].lastOwnerReported){
-                            video.copyRightOwner = video.copyRightOwner[i]
-                        }
-                    }
-                }
                 return video;
             })
             videos.docs = docs;
@@ -152,48 +144,16 @@ router.route('/')
                 }
                 res.json({success: true, message: "video Added Successfully", id: video._id})
             });
-
         });
     });
 
-router.get('/reported',(req, res, next) => {
-        Video.paginate({reported:true}, {
-            populate: ["category", "owner", "comments.owner"],
-            lean: true,
-            page: req.query.page,
-            limit: req.query.limit,
-            sort: req.query.sort,
-        }, function (err, videos) {
-            if (err) {
-                res.status(422).json({
-                    success: false,
-                    message: err.message
-                });
-            }
-            let docs = videos.docs;
-            docs = docs.map((video) => {
-                video.path = helpers.fullUrl(req, '/uploads/' + video.filename);
-                video.stream = helpers.fullUrl(req, '/api/videos/' + video._id + '/stream')
-                video.thumb = helpers.defaulter(video.thumb,helpers.fullUrl(req, '/uploads/' + video.thumb),"");
-                // get if user liked this video or not
-                video.liked = helpers.isuserinarray(video.likes,req.user._id)
-                video.disliked = helpers.isuserinarray(video.dislikes,req.user._id)
-                return video;
-            })
-            videos.docs = docs;
-            res.json(videos);
-        })
-});
-    
 router.route('/:videoId')
     
 ////Retrive video data
 
 //TODO Add check if video is violated -yes-> return copy right owner data
     .get((req, res, next) => {
-        console.log(req.user._id)
-        let query = Video.findOne({_id: req.params.videoId}).populate("owner category comments.owner");
-
+        let query = Video.findOne({_id: req.params.videoId}).populate("owner category comments.owner copyrights");
         query.lean().exec((err, video) => {
             if (err) {
                 return res.status(422).json({
@@ -213,14 +173,6 @@ router.route('/:videoId')
             video.path = helpers.fullUrl(req, '/uploads/' + video.filename);
             video.stream = helpers.fullUrl(req, '/api/videos/' + video._id + '/stream')
             video.thumb = helpers.defaulter(video.thumb,helpers.fullUrl(req, '/uploads/' + video.thumb),"");
-            // violated video
-            if(video.violated){
-                for(let i=0;i<video.copyRightOwner.length;i++){ 
-                    if(video.copyRightOwner[i].lastOwnerReported){
-                        video.copyRightOwner = video.copyRightOwner[i]
-                    }
-                }
-            }
             res.json(video);
         });
     })
@@ -412,83 +364,6 @@ router.post('/:videoId/view', (req, res, next) => {
         })
     });
 });
-
-// report api
-
-router.post('/:videoId/report', (req, res, next) => {
-    req.checkBody({
-        'email': {
-            notEmpty: true,
-            isEmail: {
-                errorMessage: 'Invalid Email'
-            },
-            errorMessage: 'Email is Required'
-        },
-        'name': {
-            notEmpty: true,
-            errorMessage: 'Name is Required'
-        },
-        'description':{
-            notEmpty: true,
-            errorMessage: 'Description is Required'   
-        }
-    })
-    req.getValidationResult().then(function (result) {
-        if (!result.isEmpty()) {
-            res.status(422).json(result.useFirstErrorOnly().mapped());
-            return;
-        }
-        Video.findOne({_id: req.params.videoId}, (err, video) => {
-            if (err) {
-                return res.status(422).json({success: false, message: err.message})
-            }
-            if (!video) {
-                return res.status(404).json({success: false, message: "video Not found"})
-            }
-            
-            let copyRightOwner_date = req.body
-            //check  if there is copy right before
-            if(video.copyRightOwner.length != 0){
-                //check  if copy right is exist before 
-                for (let i=0;i < video.copyRightOwner.length; i++){
-                    if(copyRightOwner_date.email == video.copyRightOwner[i].email || copyRightOwner_date.name == video.copyRightOwner[i].name){
-                      // return res.status(422).json({success: false, message: "This Copy rigth added before"})
-                       return res.json({success: true, message: "This Copy rigth added before"})
-                    }
-                }
-                // new copy right
-                // new copy right make all lastOwnerReported is false
-                video.copyRightOwner.map((cr)=>{
-                    cr.lastOwnerReported = false;
-                    return cr;
-                })
-                //add new copy right owner
-                console.log("new ++ "+ video.copyRightOwner)
-            }  
-            // first report OR new report ==>  make video reported
-            video.reported = true       
-            //add new copy right owner
-            video.copyRightOwner.push(copyRightOwner_date)
-            video.save((err) => {
-                if (err) {
-                    return res.status(422).json({success: false, message: err.message})
-                }
-                res.json({success: true, message: "Copy rigth added Successfully and send report to admin"})
-            })
-        })
-    });
-});
-
-router.put('/:videoId/report/approved',(req, res, next) => {
-        //update violated -> true
-        //update report -> false
-        Video.update({_id: req.params.videoId}, {"$set": {violated:true,reported:false}}, (err) => {
-            if (err) {
-                return res.status(422).json({success: false, message: err})
-            }
-            res.json({success: true, message: "Video violated Successfully"})
-        });
-    });
 
 router.get('/:videoId/similar', (req, res, next) => {
     Video.findOne({_id: req.params.videoId}, (err, video) => {
