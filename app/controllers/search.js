@@ -33,7 +33,7 @@ module.exports = function (app) {
 
  */
 router.route('/')
-    .get((req, res, next) => {
+    .post((req, res, next) => {
         Video.find({$text: {$search: req.query.q}})
             .exec(function(err, docs) {
                 if (err) {

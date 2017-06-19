@@ -8,7 +8,7 @@ const mongoosePaginate = require('mongoose-paginate');
 // Video Schema
 //= ===============================
 const ReportSchema = new Schema({
-        video: {type: Schema.ObjectId, ref: 'User'},
+        video: {type: Schema.ObjectId, ref: 'Video'},
         name: {
             type: String,
             required: true
