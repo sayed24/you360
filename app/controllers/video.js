@@ -20,7 +20,7 @@ module.exports = function (app) {
 
 
 /**
- * @api {post} /videos/:videoId/stream Striming Video
+ * @api {post} /api/videos/:videoId/stream Striming Video
  * @apiName PostStreamVideo
  * @apiGroup Video
  *
@@ -78,7 +78,7 @@ router.get('/:videoId/stream', (req, res, next) => {
 router.use(requireAuth);
 
 /**
- * @api {post} /videos/upload upload a new Video
+ * @api {post} /api/videos/upload upload a new Video
  * @apiName PostUploadVideo
  * @apiGroup Video
  *
@@ -123,7 +123,7 @@ router.post('/upload', function (req, res, next) {
 router.route('/')
 //Retrive all videos
     /**
-     * @api {get} /videos Request videos information
+     * @api {get} /api/videos Request videos information
      * @apiName GetVideos
      * @apiGroup Video
      *
@@ -178,7 +178,7 @@ router.route('/')
         })
     })
     /**
-     * @api {post} /videos Create a new Video
+     * @api {post} /api/videos Create a new Video
      * @apiName PostVideo
      * @apiGroup Video
      *
@@ -232,7 +232,7 @@ router.route('/:videoId')
     
 ////Retrive video data
         /**
-     * @api {get} /videos/videoId Request video information
+     * @api {get} /api/videos/videoId Request video information
      * @apiName GetVideo
      * @apiGroup Video
      *
@@ -286,7 +286,7 @@ router.route('/:videoId')
 
     //Delete video 
     /**
-     * @api {delete} /videos/:videoId Delete video.
+     * @api {delete} /api/videos/:videoId Delete video.
      * @apiName DeleteVideo
      * @apiGroup Video
      *
@@ -315,7 +315,7 @@ router.route('/:videoId')
 
     })
     /**
-     * @api {put} /videos/:videoId Change Video date.
+     * @api {put} /api/videos/:videoId Change Video date.
      * @apiName PutVideo
      * @apiGroup Video
      *
@@ -340,7 +340,7 @@ router.route('/:videoId')
 
 //Comment CRUD
 /**
- * @api {post} /videos/:videoId/comments Create a new comment
+ * @api {post} /api/videos/:videoId/comments Create a new comment
  * @apiName PostComment
  * @apiGroup Video Comments
  *
@@ -375,7 +375,7 @@ router.post('/:videoId/comments', (req, res, next) => {
 });
 
 /**
- * @api {delete} /videos/:videoId/comments/:commentId Delete comment.
+ * @api {delete} /api/videos/:videoId/comments/:commentId Delete comment.
  * @apiName DeleteComment
  * @apiGroup Video Comments
  *
@@ -416,7 +416,7 @@ router.route('/:videoId/comments/:commentId')
         })
     })
     /**
-     * @api {put} /videos/:videoId/comments/:commentId Edit comment.
+     * @api {put} /api/videos/:videoId/comments/:commentId Edit comment.
      * @apiName PutComment
      * @apiGroup Video Comments
      *
@@ -472,7 +472,7 @@ router.route('/:videoId/comments/:commentId')
     });
 
 /**
- * @api {post} /videos/:videoId/like like video
+ * @api {post} /api/videos/:videoId/like like video
  * @apiName PostLike
  * @apiGroup Video
  *
@@ -505,7 +505,7 @@ router.post('/:videoId/like', (req, res, next) => {
 });
 
 /**
- * @api {post} /videos/:videoId/dislike dislike video
+ * @api {post} /api/videos/:videoId/dislike dislike video
  * @apiName PostdisLike
  * @apiGroup Video
  *
@@ -538,7 +538,7 @@ router.post('/:videoId/dislike', (req, res, next) => {
 });
 
 /**
- * @api {post} /videos/:videoId/video add views video record. 
+ * @api {post} /api/videos/:videoId/video add views video record. 
  * @apiName PostViews
  * @apiGroup Video
  *
@@ -566,7 +566,7 @@ router.post('/:videoId/view', (req, res, next) => {
 });
 
 /**
- * @api {get} /videos/:videoId/similar Retrive similar videos. 
+ * @api {get} /api/videos/:videoId/similar Retrive similar videos. 
  * @apiName PostsimilarVideos
  * @apiGroup Video
  *

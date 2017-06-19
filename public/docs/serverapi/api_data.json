@@ -1,7 +1,42 @@
 [
   {
+    "type": "get",
+    "url": "/api/tags",
+    "title": "Request all tags",
+    "name": "GetTags",
+    "group": "Tag",
+    "error": {
+      "fields": {
+        "422": [
+          {
+            "group": "422",
+            "optional": false,
+            "field": "RetrivingUserError",
+            "description": "<p>Error while retriving data.</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String[]",
+            "optional": false,
+            "field": "list",
+            "description": "<p>of tags.</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "app/controllers/tag.js",
+    "groupTitle": "Tag"
+  },
+  {
     "type": "delete",
-    "url": "/users/:userId",
+    "url": "/api/users/:userId",
     "title": "Delete User.",
     "name": "DeleteUser",
     "group": "User",
@@ -56,7 +91,7 @@
   },
   {
     "type": "get",
-    "url": "/users/:userId",
+    "url": "/api/users/:userId",
     "title": "Read data of a User",
     "name": "GetUser",
     "group": "User",
@@ -110,7 +145,7 @@
   },
   {
     "type": "get",
-    "url": "/user/:userId/videos",
+    "url": "/api/users/:userId/videos",
     "title": "Request User videos information",
     "name": "GetUserVideos",
     "group": "User",
@@ -158,7 +193,7 @@
   },
   {
     "type": "get",
-    "url": "/users",
+    "url": "/api/users",
     "title": "Request Users information",
     "name": "GetUsers",
     "group": "User",
@@ -193,7 +228,7 @@
   },
   {
     "type": "post",
-    "url": "/users",
+    "url": "/api/users",
     "title": "Create a new User",
     "name": "PostUser",
     "group": "User",
@@ -259,7 +294,7 @@
   },
   {
     "type": "put",
-    "url": "/users/:userId",
+    "url": "/api/users/:userId",
     "title": "Change User date.",
     "name": "PutUser",
     "group": "User",
@@ -320,7 +355,7 @@
   },
   {
     "type": "delete",
-    "url": "/videos/:videoId",
+    "url": "/api/videos/:videoId",
     "title": "Delete video.",
     "name": "DeleteVideo",
     "group": "Video",
@@ -382,7 +417,7 @@
   },
   {
     "type": "get",
-    "url": "/videos/videoId",
+    "url": "/api/videos/videoId",
     "title": "Request video information",
     "name": "GetVideo",
     "group": "Video",
@@ -542,7 +577,7 @@
   },
   {
     "type": "get",
-    "url": "/videos",
+    "url": "/api/videos",
     "title": "Request videos information",
     "name": "GetVideos",
     "group": "Video",
@@ -696,7 +731,7 @@
   },
   {
     "type": "post",
-    "url": "/videos/:videoId/like",
+    "url": "/api/videos/:videoId/like",
     "title": "like video",
     "name": "PostLike",
     "group": "Video",
@@ -753,7 +788,7 @@
   },
   {
     "type": "post",
-    "url": "/videos/:videoId/stream",
+    "url": "/api/videos/:videoId/stream",
     "title": "Striming Video",
     "name": "PostStreamVideo",
     "group": "Video",
@@ -788,7 +823,7 @@
   },
   {
     "type": "post",
-    "url": "/videos/upload",
+    "url": "/api/videos/upload",
     "title": "upload a new Video",
     "name": "PostUploadVideo",
     "group": "Video",
@@ -830,7 +865,7 @@
   },
   {
     "type": "post",
-    "url": "/videos",
+    "url": "/api/videos",
     "title": "Create a new Video",
     "name": "PostVideo",
     "group": "Video",
@@ -899,7 +934,7 @@
   },
   {
     "type": "post",
-    "url": "/videos/:videoId/video",
+    "url": "/api/videos/:videoId/video",
     "title": "add views video record.",
     "name": "PostViews",
     "group": "Video",
@@ -956,7 +991,7 @@
   },
   {
     "type": "post",
-    "url": "/videos/:videoId/dislike",
+    "url": "/api/videos/:videoId/dislike",
     "title": "dislike video",
     "name": "PostdisLike",
     "group": "Video",
@@ -1013,7 +1048,7 @@
   },
   {
     "type": "get",
-    "url": "/videos/:videoId/similar",
+    "url": "/api/videos/:videoId/similar",
     "title": "Retrive similar videos.",
     "name": "PostsimilarVideos",
     "group": "Video",
@@ -1175,7 +1210,7 @@
   },
   {
     "type": "put",
-    "url": "/videos/:videoId",
+    "url": "/api/videos/:videoId",
     "title": "Change Video date.",
     "name": "PutVideo",
     "group": "Video",
@@ -1243,7 +1278,7 @@
   },
   {
     "type": "delete",
-    "url": "/videos/:videoId/comments/:commentId",
+    "url": "/api/videos/:videoId/comments/:commentId",
     "title": "Delete comment.",
     "name": "DeleteComment",
     "group": "Video_Comments",
@@ -1320,7 +1355,7 @@
   },
   {
     "type": "post",
-    "url": "/videos/:videoId/comments",
+    "url": "/api/videos/:videoId/comments",
     "title": "Create a new comment",
     "name": "PostComment",
     "group": "Video_Comments",
@@ -1383,7 +1418,7 @@
   },
   {
     "type": "put",
-    "url": "/videos/:videoId/comments/:commentId",
+    "url": "/api/videos/:videoId/comments/:commentId",
     "title": "Edit comment.",
     "name": "PutComment",
     "group": "Video_Comments",
