@@ -11,8 +11,32 @@ router.use(paginate.middleware(10, 50));
 module.exports = function (app) {
     app.use('/api/reports', router);
 };
+/**
+ * @apiDefine CreatereportError
+ *
+ * @apiError NoAccessRight Only authenticated.
+ * @apiError (422) videoRequired video is Required.
+ * @apiError (422) emailRequired email is Required.
+ * @apiError (422) nameRequired Name is Required.
+ * @apiError (422) descriptionRequired description is Required.
+ */
 
+/**
+ * @apiDefine ReportSuccessReturn
+ * @apiSuccess {Object} return Object is without name. 
+ * @apiSuccess {Object} return.success success flag of success data insertion.
+ * @apiSuccess {String} return.message success message.
+ */
 router.route('/')
+    /**
+     * @api {get} /api/reports Retrive Reports data
+      * @apiName Getreports
+     * @apiGroup Report
+     *
+     * @apiError (422) RetrivingCategoryError Error while retriving data.
+     *
+     * @apiSuccess {Object} reports list of reports.
+     */
     .get((req, res, next) => {
         Report.paginate({}, {
             page: req.query.page,
@@ -28,6 +52,15 @@ router.route('/')
             res.json(reports);
         })
     })
+    /**
+     * @api {post} /api/reports Create a new Report
+     * @apiName Postreport
+     * @apiGroup Report
+     *
+     * @apiuse CreatereportError
+     *
+     * @apiuse ReportSuccessReturn
+     */
     .post((req, res, next) => {
         req.checkBody({
             'video': {
@@ -66,8 +99,21 @@ router.route('/')
         });
     });
 router.route('/:reportId')
+    /**
+     * @api {get} /api/reports/:reportId Request Report information
+     * @apiName GetReport
+     * @apiGroup Report
+     *
+     * @apiParam {String} reportId The Report-ID.
+     *
+     * @apiError (422) RetrivingdataError Error while retriving data.
+     * @apiError (404) ReportNotfound Error The <code>reportId</code> of the Report was not found.
+     *
+     * @apiSuccess {Object} report report object.
+     */
     .get((req,res,next)=>{
-        Report.findOne({_id: req.params.reportId},(err, report) => {
+        let query = Report.findOne({_id: req.params.reportId}).populate("video");
+        query.lean().exec((err, report) => {
             if (err) {
                 return res.status(422).json({
                     success: false,
@@ -111,6 +157,20 @@ router.route('/:reportId')
 
         });
     });
+/**
+ * @api {post} /api/reports/:reportId/approve Request Report information
+ * @apiName PostApprove
+ * @apiGroup Report
+ *
+ * @apiParam {String} reportId The Report-ID.
+ *
+ * @apiError (422) RetrivingdataError Error while retriving data.
+ * @apiError (404) ReportNotfound Error The <code>reportId</code> of the Report was not found.
+ *
+ * @apiSuccess {Object} return Object is without name. 
+ * @apiSuccess {Object} return.success success flag of success data insertion.
+ * @apiSuccess {String} return.message success message.
+ */
 router.post('/:reportId/approve', (req, res, next) => {
     Report.findOne({_id: req.params.reportId}, (err, report) => {
         if (err) {

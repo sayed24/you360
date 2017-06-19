@@ -26,6 +26,28 @@ const requireLogin = passport.authenticate('local', {session: false});
 //= =======================================
 // Login Route
 //= =======================================
+/**
+ * @api {post} /api/login Login api
+ * @apiName PostLogin
+ * @apiGroup Authentication
+ *
+ * @apiParam {Object} user user data object.
+ * @apiParam {String} user.email user email.
+ * @apiParam {String} user.password user email.
+ * 
+ * @apiError PaswordError Minimum of 8 characters and Maximum 20 characters required.
+ *
+ * @apiSuccess (200) {Object} return Object is without name.
+ * @apiSuccess {string} return.status response status.
+ * @apiSuccess {string} return.token user token.
+ * @apiSuccess {Object} return.user user info onbject
+ * @apiSuccess {String} return.user._id <code>userId</code>,
+ * @apiSuccess {String} return.user.firstName User firstName,
+ * @apiSuccess {String} return.user.lastName rUser lastName,
+ * @apiSuccess {String} return.user.email User email,
+ * @apiSuccess {String} return.user.role User role,
+ * @apiSuccess {String} return.user.image Userimage
+ */
 router.post('/login', requireLogin, (req, res, next) => {
     const userInfo = helpers.setUserInfo(req.user);
     res.status(200).json({
@@ -41,6 +63,34 @@ router.post('/login', requireLogin, (req, res, next) => {
 //= =======================================
 // Registration Route
 //= =======================================
+/**
+ * @api {post} /api/register Registration
+ * @apiName PostRegistration
+ * @apiGroup Authentication
+ *
+ * @apiParam {Object} user user data object.
+ * @apiParam {String} user.email User email.
+ * @apiParam {String} user.password User email.
+ * @apiParam {String} user.firstName User firstName,
+ * @apiParam {String} user.lastName User lastName,
+ * 
+ * @apiError (422)PaswordError Minimum of 8 characters and Maximum 20 characters required.
+ * @apiError (422) EmailNotfoundError email address is required .
+ * @apiError (422) FirstnameNotfoundError firstname is required.
+ * @apiError (422) LastnameNotfoundError lasttname is required.
+ * @apiError (422) EmailExistError email address is already in use error.
+ *
+ * @apiSuccess (201) {Object} return Object is without name.
+ * @apiSuccess {string} return.status response status.
+ * @apiSuccess {string} return.token user token.
+ * @apiSuccess {Object} return.user user info onbject
+ * @apiSuccess {String} return.user._id <code>userId</code>,
+ * @apiSuccess {String} return.user.firstName User firstName,
+ * @apiSuccess {String} return.user.lastName rUser lastName,
+ * @apiSuccess {String} return.user.email User email,
+ * @apiSuccess {String} return.user.role User role,
+ * @apiSuccess {String} return.user.image Userimage
+ */
 router.post('/register', (req, res, next) => {
     // Check for registration errors
     const email = req.body.email;
@@ -124,7 +174,18 @@ function roleAuthorization(requiredRole) {
 //= =======================================
 // Forgot Password Route
 //= =======================================
-
+/**
+ * @api {post} /api/forgot-password forget password
+ * @apiName PostForgetPassword
+ * @apiGroup Authentication
+ *
+ * @apiParam {String} email User email.
+ *
+ * @apiError (422) EmailExistError email address is already in use error.
+ *
+ * @apiSuccess (200) {Object} return Object is without name.
+ * @apiSuccess (200) {String} return.message success message.
+ */
 router.post('/forgot-password', (req, res, next) => {
     const email = req.body.email;
 
@@ -168,6 +229,19 @@ router.post('/forgot-password', (req, res, next) => {
 // Reset Password Route
 //= =======================================
 
+/**
+ * @api {post} /api/reset-password/:token reset password
+ * @apiName PostResetPassword
+ * @apiGroup Authentication
+ *
+ * @apiParam {String} token User token.
+ * @apiParam {String} password new password
+ *
+ * @apiError (422) ExpiedTokenError token is expired
+ *
+ * @apiSuccess (200) {Object} return Object is without name.
+ * @apiSuccess (200) {String} return.message success message.
+ */
 router.post('/reset-password/:token', (req, res, next) => {
     User.findOne({resetPasswordToken: req.params.token, resetPasswordExpires: {$gt: Date.now()}}, (err, resetUser) => {
         // If query returned no results, token expired or was invalid. Return error.
