@@ -144,7 +144,7 @@ exports = module.exports = function (io) {
                 }
                 io.sockets.in('online').emit('videos count',count)
             })
-            mongoose.model('Video').count({violated:true}, function(err, count) {
+            mongoose.model('Report').count({}, function(err, count) {
                 if (err) {
                     console.log(err.message)
                 }

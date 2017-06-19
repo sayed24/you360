@@ -67,7 +67,8 @@ router.route('/')
     });
 router.route('/:reportId')
     .get((req,res,next)=>{
-        Report.findOne({_id: req.params.reportId},(err, report) => {
+        let query = Report.findOne({_id: req.params.reportId}).populate("video");
+        query.lean().exec((err, report) => {
             if (err) {
                 return res.status(422).json({
                     success: false,
