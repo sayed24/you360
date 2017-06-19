@@ -1,5 +1,414 @@
 define({ "api": [
   {
+    "type": "post",
+    "url": "/api/forgot-password",
+    "title": "forget password",
+    "name": "PostForgetPassword",
+    "group": "Authentication",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "email",
+            "description": "<p>User email.</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "422": [
+          {
+            "group": "422",
+            "optional": false,
+            "field": "EmailExistError",
+            "description": "<p>email address is already in use error.</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "200": [
+          {
+            "group": "200",
+            "type": "Object",
+            "optional": false,
+            "field": "return",
+            "description": "<p>Object is without name.</p>"
+          },
+          {
+            "group": "200",
+            "type": "String",
+            "optional": false,
+            "field": "return.message",
+            "description": "<p>success message.</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "app/controllers/authentication.js",
+    "groupTitle": "Authentication"
+  },
+  {
+    "type": "post",
+    "url": "/api/login",
+    "title": "Login api",
+    "name": "PostLogin",
+    "group": "Authentication",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Object",
+            "optional": false,
+            "field": "user",
+            "description": "<p>user data object.</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "user.email",
+            "description": "<p>user email.</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "user.password",
+            "description": "<p>user email.</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "PaswordError",
+            "description": "<p>Minimum of 8 characters and Maximum 20 characters required.</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "200": [
+          {
+            "group": "200",
+            "type": "Object",
+            "optional": false,
+            "field": "return",
+            "description": "<p>Object is without name.</p>"
+          }
+        ],
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "string",
+            "optional": false,
+            "field": "return.status",
+            "description": "<p>response status.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "string",
+            "optional": false,
+            "field": "return.token",
+            "description": "<p>user token.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "return.user",
+            "description": "<p>user info onbject</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "return.user._id",
+            "description": "<p><code>userId</code>,</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "return.user.firstName",
+            "description": "<p>User firstName,</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "return.user.lastName",
+            "description": "<p>rUser lastName,</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "return.user.email",
+            "description": "<p>User email,</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "return.user.role",
+            "description": "<p>User role,</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "return.user.image",
+            "description": "<p>Userimage</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "app/controllers/authentication.js",
+    "groupTitle": "Authentication"
+  },
+  {
+    "type": "post",
+    "url": "/api/register",
+    "title": "Registration",
+    "name": "PostRegistration",
+    "group": "Authentication",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Object",
+            "optional": false,
+            "field": "user",
+            "description": "<p>user data object.</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "user.email",
+            "description": "<p>User email.</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "user.password",
+            "description": "<p>User email.</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "user.firstName",
+            "description": "<p>User firstName,</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "user.lastName",
+            "description": "<p>User lastName,</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "422": [
+          {
+            "group": "422",
+            "optional": false,
+            "field": "PaswordError",
+            "description": "<p>Minimum of 8 characters and Maximum 20 characters required.</p>"
+          },
+          {
+            "group": "422",
+            "optional": false,
+            "field": "EmailNotfoundError",
+            "description": "<p>email address is required .</p>"
+          },
+          {
+            "group": "422",
+            "optional": false,
+            "field": "FirstnameNotfoundError",
+            "description": "<p>firstname is required.</p>"
+          },
+          {
+            "group": "422",
+            "optional": false,
+            "field": "LastnameNotfoundError",
+            "description": "<p>lasttname is required.</p>"
+          },
+          {
+            "group": "422",
+            "optional": false,
+            "field": "EmailExistError",
+            "description": "<p>email address is already in use error.</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "201": [
+          {
+            "group": "201",
+            "type": "Object",
+            "optional": false,
+            "field": "return",
+            "description": "<p>Object is without name.</p>"
+          }
+        ],
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "string",
+            "optional": false,
+            "field": "return.status",
+            "description": "<p>response status.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "string",
+            "optional": false,
+            "field": "return.token",
+            "description": "<p>user token.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "return.user",
+            "description": "<p>user info onbject</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "return.user._id",
+            "description": "<p><code>userId</code>,</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "return.user.firstName",
+            "description": "<p>User firstName,</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "return.user.lastName",
+            "description": "<p>rUser lastName,</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "return.user.email",
+            "description": "<p>User email,</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "return.user.role",
+            "description": "<p>User role,</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "return.user.image",
+            "description": "<p>Userimage</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "app/controllers/authentication.js",
+    "groupTitle": "Authentication"
+  },
+  {
+    "type": "post",
+    "url": "/api/reset-password/:token",
+    "title": "reset password",
+    "name": "PostResetPassword",
+    "group": "Authentication",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "token",
+            "description": "<p>User token.</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "password",
+            "description": "<p>new password</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "422": [
+          {
+            "group": "422",
+            "optional": false,
+            "field": "ExpiedTokenError",
+            "description": "<p>token is expired</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "200": [
+          {
+            "group": "200",
+            "type": "Object",
+            "optional": false,
+            "field": "return",
+            "description": "<p>Object is without name.</p>"
+          },
+          {
+            "group": "200",
+            "type": "String",
+            "optional": false,
+            "field": "return.message",
+            "description": "<p>success message.</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "app/controllers/authentication.js",
+    "groupTitle": "Authentication"
+  },
+  {
     "type": "delete",
     "url": "/api/categories/categoryId",
     "title": "Delete Category.",
