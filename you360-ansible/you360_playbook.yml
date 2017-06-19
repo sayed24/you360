@@ -5,9 +5,7 @@
   become_user: root
   roles:
     - git
-#    - nginx
     - mongodb
-    #- nodejs
     - nodelatest
     - clonerepo
     - nginx
