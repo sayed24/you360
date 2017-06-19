@@ -231,10 +231,12 @@ router.route('/')
 router.route('/:videoId')
     
 ////Retrive video data
-        /**
+    /**
      * @api {get} /api/videos/videoId Request video information
      * @apiName GetVideo
      * @apiGroup Video
+     *
+     * @apiParam {String} videoId The Video-ID.
      *
      * @apiError (404) RetrivingVideoError Error while retriving data.
      * @apiError (404) VideoNotfound Error Video Not found.

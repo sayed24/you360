@@ -1,5 +1,475 @@
 [
   {
+    "type": "delete",
+    "url": "/api/categories/categoryId",
+    "title": "Delete Category.",
+    "name": "DeleteCategory",
+    "group": "Category",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "categoryId",
+            "description": "<p>The Category-ID.</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "404": [
+          {
+            "group": "404",
+            "optional": false,
+            "field": "CategoryNotfound",
+            "description": "<p>Error The <code>categoryId</code>  of the Category was not found.</p>"
+          }
+        ],
+        "422": [
+          {
+            "group": "422",
+            "optional": false,
+            "field": "ModifingCategoryError",
+            "description": "<p>Error while retriving data.</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "app/controllers/category.js",
+    "groupTitle": "Category",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "return",
+            "description": "<p>Object is without name.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "return.success",
+            "description": "<p>success flag of success data insertion.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "return.message",
+            "description": "<p>success message.</p>"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "get",
+    "url": "/api/categories/categoryId",
+    "title": "Request Category information",
+    "name": "GetCategory",
+    "group": "Category",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "categoryId",
+            "description": "<p>The Category-ID.</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "404": [
+          {
+            "group": "404",
+            "optional": false,
+            "field": "CategoryNotfound",
+            "description": "<p>Error The <code>categoryId</code>  of the Category was not found.</p>"
+          }
+        ],
+        "422": [
+          {
+            "group": "422",
+            "optional": false,
+            "field": "RetrivingCategoryError",
+            "description": "<p>Error while retriving data.</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "docs",
+            "description": "<p>List of all categories.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "docs.name",
+            "description": "<p>category name.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "docs.description",
+            "description": "<p>category Description.</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "app/controllers/category.js",
+    "groupTitle": "Category"
+  },
+  {
+    "type": "get",
+    "url": "/api/:categoryId/videos",
+    "title": "Request videos related to certain category information",
+    "name": "GetCategoryVideos",
+    "group": "Category",
+    "error": {
+      "fields": {
+        "422": [
+          {
+            "group": "422",
+            "optional": false,
+            "field": "RetrivingVideoError",
+            "description": "<p>Error while retriving data.</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "docs",
+            "description": "<p>List of videos.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "docs.name",
+            "description": "<p>Video name.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "docs.description",
+            "description": "<p>Video Description.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "docs.category",
+            "description": "<p>Video category id.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "docs.filename",
+            "description": "<p>Video filename.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "docs.views",
+            "description": "<p>Number of view video.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "docs.owner",
+            "description": "<p>Video owner id.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String[]",
+            "optional": false,
+            "field": "docs.tags",
+            "description": "<p>Tags name array.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "docs.comments",
+            "description": "<p>Video comments</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "docs.comments.comment",
+            "description": "<p>Comment body.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "docs.comments.owner",
+            "description": "<p>Comment owner.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String[]",
+            "optional": false,
+            "field": "docs.dislikes",
+            "description": "<p>Array of dislike <code>usersId</code></p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String[]",
+            "optional": false,
+            "field": "docs.likes",
+            "description": "<p>Array of likes <code>usersId</code></p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "docs.path",
+            "description": "<p>Video path</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "docs.stream",
+            "description": "<p>Video stream</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "docs.thumb",
+            "description": "<p>Video thumb</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "docs.liked",
+            "description": "<p>flag for loggin user liked video</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "docs.disliked",
+            "description": "<p>flag for loggin user disliked video</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "app/controllers/category.js",
+    "groupTitle": "Category"
+  },
+  {
+    "type": "get",
+    "url": "/api/categories",
+    "title": "Request videos information",
+    "name": "Getcategories",
+    "group": "Category",
+    "error": {
+      "fields": {
+        "422": [
+          {
+            "group": "422",
+            "optional": false,
+            "field": "RetrivingCategoryError",
+            "description": "<p>Error while retriving data.</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "docs",
+            "description": "<p>List of all categories.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "docs.name",
+            "description": "<p>category name.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "docs.description",
+            "description": "<p>category Description.</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "app/controllers/category.js",
+    "groupTitle": "Category"
+  },
+  {
+    "type": "post",
+    "url": "/api/categories",
+    "title": "Create a new Category",
+    "name": "Postcategories",
+    "group": "Category",
+    "version": "0.0.0",
+    "filename": "app/controllers/category.js",
+    "groupTitle": "Category",
+    "error": {
+      "fields": {
+        "422": [
+          {
+            "group": "422",
+            "optional": false,
+            "field": "nameRequired",
+            "description": "<p>Name is Required.</p>"
+          }
+        ],
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "NoAccessRight",
+            "description": "<p>Only authenticated.</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "return",
+            "description": "<p>Object is without name.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "return.success",
+            "description": "<p>success flag of success data insertion.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "return.message",
+            "description": "<p>success message.</p>"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "put",
+    "url": "/api/categories/categoryId",
+    "title": "Delete Category.",
+    "name": "PutCategory",
+    "group": "Category",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "categoryId",
+            "description": "<p>The Category-ID.</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "404": [
+          {
+            "group": "404",
+            "optional": false,
+            "field": "CategoryNotfound",
+            "description": "<p>Error The <code>categoryId</code>  of the Category was not found.</p>"
+          }
+        ],
+        "422": [
+          {
+            "group": "422",
+            "optional": false,
+            "field": "ModifingCategoryError",
+            "description": "<p>Error while retriving data.</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "app/controllers/category.js",
+    "groupTitle": "Category",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "return",
+            "description": "<p>Object is without name.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "return.success",
+            "description": "<p>success flag of success data insertion.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "return.message",
+            "description": "<p>success message.</p>"
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "get",
     "url": "/api/search",
     "title": "full text search in videos",
@@ -575,6 +1045,19 @@
     "title": "Request video information",
     "name": "GetVideo",
     "group": "Video",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "videoId",
+            "description": "<p>The Video-ID.</p>"
+          }
+        ]
+      }
+    },
     "error": {
       "fields": {
         "404": [
