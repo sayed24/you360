@@ -24,7 +24,33 @@ router.use(requireAuth);
 //= =======================================
 // User Routes
 //= =======================================
+
+/**
+ * @apiDefine CreateUserError
+ *
+ * @apiError NoAccessRight Only authenticated.
+ * @apiError PaswordError Minimum of 8 characters and Maximum 20 characters required.
+ * @apiError InvalidEmail Invalid Email.
+ * @apiError firstnameRequired First Name is Required.
+ * @apiError lastnameRequired First Name is Required.
+ */
+
+/**
+ * @apiDefine UserSuccessReturn
+ * @apiSuccess {String} success flag of success data insertion.
+ * @apiSuccess {String} message success message.
+ */
+
 router.route('/')
+    /**
+     * @api {get} /users Request Users information
+     * @apiName GetUsers
+     * @apiGroup User
+     *
+     * @apiError RetrivingUserError Error while retriving data.
+     *
+     * @apiSuccess {Array} users Array of user information.
+     */
     .get((req, res, next) => {
         User.paginate({}, {page: req.query.page, limit: req.query.limit}, function (err, users) {
             if (err) {
@@ -37,6 +63,15 @@ router.route('/')
         });
 
     })
+    /**
+     * @api {post} /users Create a new User
+     * @apiName PostUser
+     * @apiGroup User
+     *
+     * @apiuse CreateUserError
+     *
+     * @apiuse UserSuccessReturn
+     */
     .post((req, res, next) => {
         req.checkBody({
             notEmpty: true,
@@ -83,6 +118,18 @@ router.route('/')
 
 
 router.route('/:userId')
+    /**
+     * @api {get} /users/:userId Read data of a User
+     * @apiName GetUser
+     * @apiGroup User
+     *
+     * @apiParam {String} userId The Users-ID.
+     * 
+     * @apiError RetrivingUserError Error while retriving data.
+     * @apiError UserNotFound   The <code>userId</code> of the User was not found.
+     *
+     * @apiSuccess {Object}   user     The User information.
+     */
     .get((req, res, next) => {
         let query = User.findOne({_id: req.params.userId});
         query.exec((err, user) => {
@@ -99,6 +146,18 @@ router.route('/:userId')
         });
 
     })
+    /**
+     * @api {put} /users/:userId Change User date.
+     * @apiName PutUser
+     * @apiGroup User
+     *
+     * @apiParam {String} userId The Users-ID.
+     * 
+     * @apiError ModifingUserError Error while retriving data.
+     * @apiError UserNotFound   The <code>userId</code> of the User was not found.
+     *
+     * @apiuse UserSuccessReturn
+     */
     .put((req, res, next) => {
         let userdata = req.body;
 
@@ -114,6 +173,18 @@ router.route('/:userId')
             res.json({success: true, message: "User Updated Successfully"})
         });
     })
+    /**
+     * @api {delete} /users/:userId Delete User.
+     * @apiName DeleteUser
+     * @apiGroup User
+     *
+     * @apiParam {String} userId The Users-ID.
+     * 
+     * 
+     * @apiError UserNotFound   The <code>userId</code> of the User was not found.
+     *
+     * @apiuse UserSuccessReturn
+     */
     .delete((req, res, next) => {
         User.findOne({_id: req.params.userId}, (err, user) => {
             if (err) {
@@ -145,6 +216,18 @@ router.get('/:userId/notifications', (req, res, next) => {
         res.json(notification);
     })
 });
+/**
+ * @api {get} /user/:userId/videos Request User videos information
+ * @apiName GetUserVideos
+ * @apiGroup User
+ *
+ * @apiError RetrivingVideosError Error while retriving data.
+ *
+ * @apiParam {Number} userId Users unique ID.
+ *
+ * @apiSuccess {Array} videos Array of user Videos
+ */
+
 router.get('/:userId/videos', (req, res, next) => {
     Video.paginate({owner: req.params.userId}, {
         page: req.query.page,

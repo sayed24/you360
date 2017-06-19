@@ -19,6 +19,7 @@ module.exports = function (app) {
 };
 
 
+
 var upload_video = multer({
     dest: "public/uploads",
     rename: function (fieldname, filename) {
@@ -27,38 +28,36 @@ var upload_video = multer({
 }).single('video');
 router.get('/:videoId/stream', (req, res, next) => {
     Video.findOne({_id:req.params.videoId},(err,video)=>{
-        let path = ''
-        if(video.filename){
-            path = process.cwd() + `/public/uploads/${video.filename}`;
+        let  path = process.cwd() + `/public/uploads/${video.filename}`;
+        if (fs.existsSync(path)) {
+            let stat = fs.statSync(path);
+            let total = stat.size;
+            if (req.headers['range']) {
+                let range = req.headers.range;
+                let parts = range.replace(/bytes=/, "").split("-");
+                let partialstart = parts[0];
+                let partialend = parts[1];
+
+                let start = parseInt(partialstart, 10);
+                let end = partialend ? parseInt(partialend, 10) : total - 1;
+                let chunksize = (end - start) + 1;
+                console.log('RANGE: ' + start + ' - ' + end + ' = ' + chunksize);
+
+                let file = fs.createReadStream(path, {start: start, end: end});
+                res.writeHead(206, {
+                    'Content-Range': 'bytes ' + start + '-' + end + '/' + total,
+                    'Accept-Ranges': 'bytes',
+                    'Content-Length': chunksize,
+                    'Content-Type': 'video/mp4'
+                });
+                file.pipe(res);
+            } else {
+                console.log('ALL: ' + total);
+                res.writeHead(200, {'Content-Length': total, 'Content-Type': 'video/mp4'});
+                fs.createReadStream(path).pipe(res);
+            }
         }else{
             return res.status(404).json("file not found")
-        }
-        console.log(path);
-        let stat = fs.statSync(path);
-        let total = stat.size;
-        if (req.headers['range']) {
-            let range = req.headers.range;
-            let parts = range.replace(/bytes=/, "").split("-");
-            let partialstart = parts[0];
-            let partialend = parts[1];
-
-            let start = parseInt(partialstart, 10);
-            let end = partialend ? parseInt(partialend, 10) : total - 1;
-            let chunksize = (end - start) + 1;
-            console.log('RANGE: ' + start + ' - ' + end + ' = ' + chunksize);
-
-            let file = fs.createReadStream(path, {start: start, end: end});
-            res.writeHead(206, {
-                'Content-Range': 'bytes ' + start + '-' + end + '/' + total,
-                'Accept-Ranges': 'bytes',
-                'Content-Length': chunksize,
-                'Content-Type': 'video/mp4'
-            });
-            file.pipe(res);
-        } else {
-            console.log('ALL: ' + total);
-            res.writeHead(200, {'Content-Length': total, 'Content-Type': 'video/mp4'});
-            fs.createReadStream(path).pipe(res);
         }
     })
 
@@ -66,6 +65,7 @@ router.get('/:videoId/stream', (req, res, next) => {
 
 
 router.use(requireAuth);
+
 
 router.post('/upload', function (req, res, next) {
     upload_video(req, res, function (err) {
@@ -77,12 +77,55 @@ router.post('/upload', function (req, res, next) {
     });
 });
 
+/**
+ * @apiDefine CreateVideoError
+ *
+ * @apiError NoAccessRight Only authenticated.
+ * @apiError (422) nameRequired Name is Required.
+ * @apiError (422) descriptionRequired Descriptionis Required.
+ * @apiError (422) categoryRequired Category is Required.
+ */
+
+/**
+ * @apiDefine VideoSuccessReturn
+ * @apiSuccess {Object} return Object is without name. 
+ * @apiSuccess {Object} return.success success flag of success data insertion.
+ * @apiSuccess {String} return.message success message.
+ */
+
 
 /*
 * CRUD operations
 */
 router.route('/')
 //Retrive all videos
+    /**
+     * @api {get} /videos Request videos information
+     * @apiName GetVideos
+     * @apiGroup Video
+     *
+     * @apiError (404) RetrivingVideoError Error while retriving data.
+     *
+     * @apiSuccess {Object[]} docs List of videos.
+     * @apiSuccess {String} docs.name Video name.
+     * @apiSuccess {String} docs.description Video Description.
+     * @apiSuccess {String} docs.category Video category id.
+     * @apiSuccess {String} docs.filename Video filename.
+     * @apiSuccess {Number} docs.views Number of view video.
+     * @apiSuccess {String} docs.owner Video owner id.
+     * @apiSuccess {String[]} docs.tags Tags name array.
+     * @apiSuccess {Object[]} docs.comments Video comments
+     * @apiSuccess {String} docs.comments.comment Comment body.
+     * @apiSuccess {String} docs.comments.owner Comment owner.
+     * @apiSuccess {String[]} docs.dislikes Array of dislike <code>usersId</code> 
+     * @apiSuccess {String[]} docs.likes Array of likes <code>usersId</code> 
+     * @apiSuccess {String} docs.path Video path
+     * @apiSuccess {String} docs.stream Video stream
+     * @apiSuccess {String} docs.thumb Video thumb
+     * @apiSuccess {Boolean} docs.liked flag for loggin user liked video 
+     * @apiSuccess {Boolean} docs.disliked flag for loggin user disliked video
+
+     */
     .get((req, res, next) => {
         Video.paginate({}, {
             populate: ["category", "owner", "comments.owner","copyrights"],
@@ -111,6 +154,15 @@ router.route('/')
             res.json(videos);
         })
     })
+    /**
+     * @api {post} /videos Create a new Video
+     * @apiName PostVideo
+     * @apiGroup Video
+     *
+     * @apiuse CreateVideoError
+     *
+     * @apiuse VideoSuccessReturn
+     */
     //Create New video  
     .post((req, res, next) => {
         req.checkBody({
@@ -156,8 +208,34 @@ router.route('/')
 router.route('/:videoId')
     
 ////Retrive video data
+        /**
+     * @api {get} /videos/videoId Request video information
+     * @apiName GetVideo
+     * @apiGroup Video
+     *
+     * @apiError (404) RetrivingVideoError Error while retriving data.
+     * @apiError (404) VideoNotfound Error Video Not found.
+     *
+     * @apiSuccess {Object}  docs Video information
+     * @apiSuccess {String} docs.name Video name.
+     * @apiSuccess {String} docs.description Video Description.
+     * @apiSuccess {String} docs.category Video category id.
+     * @apiSuccess {String} docs.filename Video filename.
+     * @apiSuccess {Number} docs.views Number of view video.
+     * @apiSuccess {String} docs.owner Video owner id.
+     * @apiSuccess {String[]} docs.tags Tags name array.
+     * @apiSuccess {Object[]} docs.comments Video comments
+     * @apiSuccess {String} docs.comments.comment Comment body.
+     * @apiSuccess {String} docs.comments.owner Comment owner.
+     * @apiSuccess {String[]} docs.dislikes Array of dislike <code>usersId</code> 
+     * @apiSuccess {String[]} docs.likes Array of likes <code>usersId</code> 
+     * @apiSuccess {String} docs.path Video path
+     * @apiSuccess {String} docs.stream Video stream
+     * @apiSuccess {String} docs.thumb Video thumb
+     * @apiSuccess {Boolean} docs.liked flag for loggin user liked video 
+     * @apiSuccess {Boolean} docs.disliked flag for loggin user disliked video
 
-//TODO Add check if video is violated -yes-> return copy right owner data
+     */
     .get((req, res, next) => {
         let query = Video.findOne({_id: req.params.videoId}).populate("owner category comments.owner copyrights");
         query.lean().exec((err, video) => {
@@ -184,6 +262,18 @@ router.route('/:videoId')
     })
 
     //Delete video 
+    /**
+     * @api {delete} /videos/:videoId Delete video.
+     * @apiName DeleteVideo
+     * @apiGroup Video
+     *
+     * @apiParam {String} videoId The Video-ID.
+     * 
+     * 
+     * @apiError (404) VideoNotFound   The <code>VideoId</code> of the Video was not found.
+     *
+     * @apiuse VideoSuccessReturn
+     */
     .delete((req, res, next) => {
         Video.findOne({_id: req.params.videoId}, (err, video) => {
             if (err) {
@@ -201,6 +291,18 @@ router.route('/:videoId')
         })
 
     })
+    /**
+     * @api {put} /videos/:videoId Change Video date.
+     * @apiName PutVideo
+     * @apiGroup Video
+     *
+     * @apiParam {String} videoId The Video-ID.
+     * 
+     * @apiError ModifingVidepError Error while retriving data.
+     * @apiError VideoNotFound   The <code>videoId</code> of the Video was not found.
+     *
+     * @apiuse VideoSuccessReturn
+     */
     //Update video info
     .put((req, res, next) => {
         //update name,description,cat,tag
@@ -214,6 +316,17 @@ router.route('/:videoId')
     });
 
 //Comment CRUD
+/**
+ * @api {post} /videos/:videoId/comments Create a new comment
+ * @apiName PostComment
+ * @apiGroup Video Comments
+ *
+ * @apiError (422) RetrivingVideoError Error while retriving data.
+ * @apiError (404) VideoNotfound Error Video Not found.
+ * @apiError (422) commentRequired Comment is Required.
+ *
+ * @apiuse VideoSuccessReturn
+ */
 router.post('/:videoId/comments', (req, res, next) => {
     let commentinfo = req.body;
     req.checkBody({
@@ -238,6 +351,19 @@ router.post('/:videoId/comments', (req, res, next) => {
     });
 });
 
+/**
+ * @api {delete} /videos/:videoId/comments/:commentId Delete comment.
+ * @apiName DeleteComment
+ * @apiGroup Video Comments
+ *
+ * @apiParam {String} videoId The Video-ID.
+ * @apiParam {String} commentId The Comment-ID.
+ * 
+ * @apiError (404) VideoNotFound   The <code>VideoId</code> of the Video was not found.
+ * @apiError (422) RetrivingdataError Error while retriving data.
+ *
+ * @apiuse VideoSuccessReturn
+ */ 
 router.route('/:videoId/comments/:commentId')
     .delete((req, res, next) => {
         Video.findOne({_id: req.params.videoId}, (err, video) => {
@@ -266,6 +392,20 @@ router.route('/:videoId/comments/:commentId')
             });
         })
     })
+    /**
+     * @api {put} /videos/:videoId/comments/:commentId Edit comment.
+     * @apiName PutComment
+     * @apiGroup Video Comments
+     *
+     * @apiParam {String} videoId The Video-ID.
+     * @apiParam {String} commentId The Comment-ID.
+     * 
+     * @apiError (404) VideoNotFound   The <code>VideoId</code> of the Video was not found.
+     * @apiError (422) RetrivingdataError Error while retriving data.
+     * @apiError (422) commentRequired Comment is Required.
+     *
+     * @apiuse VideoSuccessReturn
+     */ 
     .put((req, res, next) => {
         let commentdata = req.body;
         req.checkBody({
@@ -308,6 +448,16 @@ router.route('/:videoId/comments/:commentId')
         });
     });
 
+/**
+ * @api {post} /videos/:videoId/like like video
+ * @apiName PostLike
+ * @apiGroup Video
+ *
+ * @apiError (422) RetrivingVideoError Error while retriving data.
+ * @apiError (404) VideoNotfound Error Video Not found.
+ *
+ * @apiuse VideoSuccessReturn
+ */
 //video likes api
 router.post('/:videoId/like', (req, res, next) => {
 
@@ -331,6 +481,17 @@ router.post('/:videoId/like', (req, res, next) => {
     });
 });
 
+/**
+ * @api {post} /videos/:videoId/dislike dislike video
+ * @apiName PostdisLike
+ * @apiGroup Video
+ *
+ * @apiError (422) RetrivingVideoError Error while retriving data.
+ * @apiError (404) VideoNotfound Error Video Not found.
+ *
+ * @apiuse VideoSuccessReturn
+ */
+
 //video dislikes api
 router.post('/:videoId/dislike', (req, res, next) => {
     Video.findOne({_id: req.params.videoId}, (err, video) => {
@@ -353,6 +514,16 @@ router.post('/:videoId/dislike', (req, res, next) => {
     });
 });
 
+/**
+ * @api {post} /videos/:videoId/video add views video record. 
+ * @apiName PostViews
+ * @apiGroup Video
+ *
+ * @apiError (422) RetrivingVideoError Error while retriving data.
+ * @apiError (404) VideoNotfound Error Video Not found.
+ *
+ * @apiuse VideoSuccessReturn
+ */
 //video views api
 router.post('/:videoId/view', (req, res, next) => {
     Video.findOne({_id: req.params.videoId}, (err, video) => {
@@ -370,6 +541,35 @@ router.post('/:videoId/view', (req, res, next) => {
         })
     });
 });
+
+/**
+ * @api {get} /videos/:videoId/similar Retrive similar videos. 
+ * @apiName PostsimilarVideos
+ * @apiGroup Video
+ *
+ * @apiError (422) RetrivingVideoError Error while retriving data.
+ * @apiError (404) VideoNotfound Error Video Not found.
+ *
+ * @apiSuccess {Object[]}  docs Video information
+ * @apiSuccess {String} docs.name Video name.
+ * @apiSuccess {String} docs.description Video Description.
+ * @apiSuccess {String} docs.category Video category id.
+ * @apiSuccess {String} docs.filename Video filename.
+ * @apiSuccess {Number} docs.views Number of view video.
+ * @apiSuccess {String} docs.owner Video owner id.
+ * @apiSuccess {String[]} docs.tags Tags name array.
+ * @apiSuccess {Object[]} docs.comments Video comments
+ * @apiSuccess {String} docs.comments.comment Comment body.
+ * @apiSuccess {String} docs.comments.owner Comment owner.
+ * @apiSuccess {String[]} docs.dislikes Array of dislike <code>usersId</code> 
+ * @apiSuccess {String[]} docs.likes Array of likes <code>usersId</code> 
+ * @apiSuccess {String} docs.path Video path
+ * @apiSuccess {String} docs.stream Video stream
+ * @apiSuccess {String} docs.thumb Video thumb
+ * @apiSuccess {Boolean} docs.liked flag for loggin user liked video 
+ * @apiSuccess {Boolean} docs.disliked flag for loggin user disliked video
+
+ */
 
 router.get('/:videoId/similar', (req, res, next) => {
     Video.findOne({_id: req.params.videoId}, (err, video) => {
@@ -401,14 +601,6 @@ router.get('/:videoId/similar', (req, res, next) => {
                 // get if user liked this video or not
                 video.liked = helpers.isuserinarray(video.likes,req.user._id)
                 video.disliked = helpers.isuserinarray(video.dislikes,req.user._id)
-                // violated video
-                if(video.violated){
-                    for(let i=0;i<video.copyRightOwner.length;i++){ 
-                        if(video.copyRightOwner[i].lastOwnerReported){
-                            video.copyRightOwner = video.copyRightOwner[i]
-                        }
-                    }
-                }
                 return video;
             })
             videos.docs = docs;
