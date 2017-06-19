@@ -17,7 +17,7 @@ router.use(requireAuth);
  * @apiName GetTags
  * @apiGroup Tag
  *
- * @apiError (422) RetrivingUserError Error while retriving data.
+ * @apiError (422) RetrivingTagError Error while retriving data.
  *
  * @apiSuccess {String[]} list of tags.
  */
