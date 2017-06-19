@@ -6,8 +6,8 @@ module.exports = function (app) {
     app.use('/api/search', router);
 };
 /**
- * @api {get} /api/search full text search in videos 
- * @apiName GetSearch
+ * @api {post} /api/search full text search in videos 
+ * @apiName PostSearch
  * @apiGroup Search
  *
  * @apiError (422) RetrivingdataError Error while retriving data.
