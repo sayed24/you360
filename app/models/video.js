@@ -1,11 +1,10 @@
-    // Importing Node packages required for schema
+// Importing Node packages required for schema
 const mongoose = require('mongoose');
 const helpers = require('../helpers');
 const Schema = mongoose.Schema;
 // pagination
 const mongoosePaginate = require('mongoose-paginate');
-//search 
-const mongooseApiQuery = require('mongoose-api-query');
+
 //= ===============================
 // Video Schema
 //= ===============================
@@ -24,28 +23,36 @@ const VideoSchema = new Schema({
         },
         path: {
             type: String,
-            default:""
+            default: ""
         },
         views: {type: Number},
         likes: [{type: Schema.Types.ObjectId, ref: "User"}],
         dislikes: [{type: Schema.Types.ObjectId, ref: "User"}],
         //comments: [{type: Schema.Types.ObjectId, ref: "Comment"}],
-        comments:[{
-            comment:{type: String},
-            owner:{type: Schema.Types.ObjectId, ref: "User"}
+        comments: [{
+            comment: {type: String},
+            owner: {type: Schema.Types.ObjectId, ref: "User"}
         }],
         //tags: [{type: Schema.Types.ObjectId, ref: "Tag"}],
         tags: [{type: String}],
         category: {type: Schema.Types.ObjectId, ref: "Category"},
-        lat:{
+        lat: {
             type: String,
             // required: true
         },
-        long:{
+        long: {
             type: String,
             // required: true
         },
         owner: {type: Schema.Types.ObjectId, ref: "User"},
+        violated:{
+            type: Boolean,
+            default: false
+        },
+        copyrights:{
+            type: Schema.ObjectId,
+            ref: 'Report'
+        },
         thumb: {type: String},
 
     },
@@ -54,25 +61,33 @@ const VideoSchema = new Schema({
         timestamps: true,
     });
 
+//= index =//
+VideoSchema.index({'$**': 'text'});
+
+
 VideoSchema.pre('remove', function (next) {
     // Remove all related docs
     helpers.removeFile(this.image);
     next();
 });
-//= ===============================
-// Video ORM Methods
-//= ===============================
+
 //= ===============================
 // User ORM Virtuals
 //= ===============================
+
+// Pre-delete of video to database,
+VideoSchema.pre('remove', function (next) {
+    // Remove related file
+    helpers.removeFile(this.filename);
+    next();
+    
+
+});
+
 
 /*
  * pagination
 */
 VideoSchema.plugin(mongoosePaginate);
-/*
- * Search
-*/
-VideoSchema.plugin(mongooseApiQuery);
 
 mongoose.model('Video', VideoSchema);

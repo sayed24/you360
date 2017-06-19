@@ -1,12 +1,11 @@
 const router = require('express').Router(),
     passport = require('passport'),
-    uuid = require('uuid'),
     fs = require('fs'),
     helpers = require('../helpers'),
     config = require('../../config/config'),
-    mongoose = require('mongoose'),
     User = require('mongoose').model('User'),
     Video = require('mongoose').model('Video'),
+    Report = require('mongoose').model('Report'),
     Category = require('mongoose').model('Category'),
     paginate = require('express-paginate'),
     multer = require('multer');
@@ -20,6 +19,7 @@ module.exports = function (app) {
 };
 
 
+
 var upload_video = multer({
     dest: "public/uploads",
     rename: function (fieldname, filename) {
@@ -27,38 +27,45 @@ var upload_video = multer({
     }
 }).single('video');
 router.get('/:videoId/stream', (req, res, next) => {
+    Video.findOne({_id:req.params.videoId},(err,video)=>{
+        let  path = process.cwd() + `/public/uploads/${video.filename}`;
+        if (fs.existsSync(path)) {
+            let stat = fs.statSync(path);
+            let total = stat.size;
+            if (req.headers['range']) {
+                let range = req.headers.range;
+                let parts = range.replace(/bytes=/, "").split("-");
+                let partialstart = parts[0];
+                let partialend = parts[1];
 
-    let path = process.cwd() + "/public/pano.mp4";
-    let stat = fs.statSync(path);
-    let total = stat.size;
-    if (req.headers['range']) {
-        let range = req.headers.range;
-        let parts = range.replace(/bytes=/, "").split("-");
-        let partialstart = parts[0];
-        let partialend = parts[1];
+                let start = parseInt(partialstart, 10);
+                let end = partialend ? parseInt(partialend, 10) : total - 1;
+                let chunksize = (end - start) + 1;
+                console.log('RANGE: ' + start + ' - ' + end + ' = ' + chunksize);
 
-        let start = parseInt(partialstart, 10);
-        let end = partialend ? parseInt(partialend, 10) : total - 1;
-        let chunksize = (end - start) + 1;
-        console.log('RANGE: ' + start + ' - ' + end + ' = ' + chunksize);
+                let file = fs.createReadStream(path, {start: start, end: end});
+                res.writeHead(206, {
+                    'Content-Range': 'bytes ' + start + '-' + end + '/' + total,
+                    'Accept-Ranges': 'bytes',
+                    'Content-Length': chunksize,
+                    'Content-Type': 'video/mp4'
+                });
+                file.pipe(res);
+            } else {
+                console.log('ALL: ' + total);
+                res.writeHead(200, {'Content-Length': total, 'Content-Type': 'video/mp4'});
+                fs.createReadStream(path).pipe(res);
+            }
+        }else{
+            return res.status(404).json("file not found")
+        }
+    })
 
-        let file = fs.createReadStream(path, {start: start, end: end});
-        res.writeHead(206, {
-            'Content-Range': 'bytes ' + start + '-' + end + '/' + total,
-            'Accept-Ranges': 'bytes',
-            'Content-Length': chunksize,
-            'Content-Type': 'video/mp4'
-        });
-        file.pipe(res);
-    } else {
-        console.log('ALL: ' + total);
-        res.writeHead(200, {'Content-Length': total, 'Content-Type': 'video/mp4'});
-        fs.createReadStream(path).pipe(res);
-    }
 });
 
 
 router.use(requireAuth);
+
 
 router.post('/upload', function (req, res, next) {
     upload_video(req, res, function (err) {
@@ -70,18 +77,62 @@ router.post('/upload', function (req, res, next) {
     });
 });
 
+/**
+ * @apiDefine CreateVideoError
+ *
+ * @apiError NoAccessRight Only authenticated.
+ * @apiError (422) nameRequired Name is Required.
+ * @apiError (422) descriptionRequired Descriptionis Required.
+ * @apiError (422) categoryRequired Category is Required.
+ */
+
+/**
+ * @apiDefine VideoSuccessReturn
+ * @apiSuccess {Object} return Object is without name. 
+ * @apiSuccess {Object} return.success success flag of success data insertion.
+ * @apiSuccess {String} return.message success message.
+ */
+
 
 /*
 * CRUD operations
 */
 router.route('/')
 //Retrive all videos
+    /**
+     * @api {get} /videos Request videos information
+     * @apiName GetVideos
+     * @apiGroup Video
+     *
+     * @apiError (404) RetrivingUserError Error while retriving data.
+     *
+     * @apiSuccess {Object[]} docs List of videos.
+     * @apiSuccess {String} docs.name Video name.
+     * @apiSuccess {String} docs.description Video Description.
+     * @apiSuccess {String} docs.category Video category id.
+     * @apiSuccess {String} docs.filename Video filename.
+     * @apiSuccess {Number} docs.views Number of view video.
+     * @apiSuccess {String} docs.owner Video owner id.
+     * @apiSuccess {String[]} docs.tags Tags name array.
+     * @apiSuccess {Object[]} docs.comments Video comments
+     * @apiSuccess {String} docs.comments.comment Comment body.
+     * @apiSuccess {String} docs.comments.owner Comment owner.
+     * @apiSuccess {String[]} docs.dislikes Array of dislike <code>usersId</code> 
+     * @apiSuccess {String[]} docs.likes Array of likes <code>usersId</code> 
+     * @apiSuccess {String} docs.path Video path
+     * @apiSuccess {String} docs.stream Video stream
+     * @apiSuccess {String} docs.thumb Video thumb
+     * @apiSuccess {Boolean} docs.liked flag for loggin user liked video 
+     * @apiSuccess {Boolean} docs.disliked flag for loggin user disliked video
+
+     */
     .get((req, res, next) => {
         Video.paginate({}, {
-            populate: ["category", "owner", "comments.owner"],
+            populate: ["category", "owner", "comments.owner","copyrights"],
             lean: true,
             page: req.query.page,
-            limit: req.query.limit
+            limit: req.query.limit,
+            sort: req.query.sort,
         }, function (err, videos) {
             if (err) {
                 res.status(422).json({
@@ -94,21 +145,25 @@ router.route('/')
                 video.path = helpers.fullUrl(req, '/uploads/' + video.filename);
                 video.stream = helpers.fullUrl(req, '/api/videos/' + video._id + '/stream')
                 video.thumb = helpers.defaulter(video.thumb,helpers.fullUrl(req, '/uploads/' + video.thumb),"");
-                if (video.likes.toString().includes(String(req.user._id))) {
-                    video.liked = true;
-                }
-                else {
-                    video.liked = false;
-                }
+                // get if user liked this video or not
+                video.liked = helpers.isuserinarray(video.likes,req.user._id)
+                video.disliked = helpers.isuserinarray(video.dislikes,req.user._id)
                 return video;
             })
             videos.docs = docs;
             res.json(videos);
         })
     })
-    //Create New video
-
-    //TODO Add video uploader   
+    /**
+     * @api {post} /videos Create a new Video
+     * @apiName PostVideo
+     * @apiGroup Video
+     *
+     * @apiuse CreateVideoError
+     *
+     * @apiuse VideoSuccessReturn
+     */
+    //Create New video  
     .post((req, res, next) => {
         req.checkBody({
             notEmpty: true,
@@ -137,7 +192,7 @@ router.route('/')
             }
             video.views = 0
             video.owner = req.user._id
-            //TODO add new tag
+            //video.copyRightOwner = []
             if (!video.hasOwnProperty('tags')) {
                 video.tags = []
             }
@@ -147,17 +202,16 @@ router.route('/')
                 }
                 res.json({success: true, message: "video Added Successfully", id: video._id})
             });
-
         });
     });
 
 router.route('/:videoId')
     
 ////Retrive video data
-    .get((req, res, next) => {
-        console.log(req.user._id)
-        let query = Video.findOne({_id: req.params.videoId}).populate("owner category comments.owner");
 
+//TODO Add check if video is violated -yes-> return copy right owner data
+    .get((req, res, next) => {
+        let query = Video.findOne({_id: req.params.videoId}).populate("owner category comments.owner copyrights");
         query.lean().exec((err, video) => {
             if (err) {
                 return res.status(422).json({
@@ -168,13 +222,10 @@ router.route('/:videoId')
             if (!video) {
                 return res.status(404).json({success: false, message: "Video Not found"})
             }
-            if (video.likes.toString().includes(String(req.user._id))) {
+            // get if user liked this video or not
+            video.liked = helpers.isuserinarray(video.likes,req.user._id)
+            video.disliked = helpers.isuserinarray(video.dislikes,req.user._id)
 
-                video.liked = true;
-            }
-            else {
-                video.liked = false;
-            }
             video.likes = video.likes.length;
             video.dislikes = video.dislikes.length;
             video.path = helpers.fullUrl(req, '/uploads/' + video.filename);
@@ -213,7 +264,6 @@ router.route('/:videoId')
             res.json({success: true, message: "Video Updated Successfully"})
         });
     });
-//TODO Add play video link in gui
 
 //Comment CRUD
 router.post('/:videoId/comments', (req, res, next) => {
@@ -373,3 +423,48 @@ router.post('/:videoId/view', (req, res, next) => {
     });
 });
 
+router.get('/:videoId/similar', (req, res, next) => {
+    Video.findOne({_id: req.params.videoId}, (err, video) => {
+        if (err) {
+            return res.status(422).json({success: false, message: err.message})
+        }
+        if (!video) {
+            return res.status(404).json({success: false, message: "video Not found"})
+        }
+        let vtags = video.tags;
+        Video.paginate({_id: {$ne: req.params.videoId},tags: {$in:vtags}}, {
+            populate: ["category", "owner", "comments.owner"],
+            lean: true,
+            page: req.query.page,
+            limit: req.query.limit,
+            sort: req.query.sort,
+        }, (err, videos) => {
+            if (err) {
+                res.status(422).json({
+                    success: false,
+                    message: err.message
+                });
+            }
+            let docs = videos.docs;
+            docs = docs.map((video) => {
+                video.path = helpers.fullUrl(req, '/uploads/' + video.filename);
+                video.stream = helpers.fullUrl(req, '/api/videos/' + video._id + '/stream')
+                video.thumb = helpers.defaulter(video.thumb,helpers.fullUrl(req, '/uploads/' + video.thumb),"");
+                // get if user liked this video or not
+                video.liked = helpers.isuserinarray(video.likes,req.user._id)
+                video.disliked = helpers.isuserinarray(video.dislikes,req.user._id)
+                // violated video
+                if(video.violated){
+                    for(let i=0;i<video.copyRightOwner.length;i++){ 
+                        if(video.copyRightOwner[i].lastOwnerReported){
+                            video.copyRightOwner = video.copyRightOwner[i]
+                        }
+                    }
+                }
+                return video;
+            })
+            videos.docs = docs;
+            res.json(videos);
+        })
+    })
+})

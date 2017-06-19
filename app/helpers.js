@@ -54,17 +54,26 @@ exports.removeFile=function removeFile(file){
     }
 
 }
+
+/** 
+ * @function mergeArrayUnique
+ * Convert array to uniqe array items
+ * @param {Array} array - array to convert 
+ * @returns {Array} a - array with uniqe items
+ */
+
 exports.mergeArrayUnique = function mergeArrayUnique(array) {
-    var a = array.concat();
-    for(var i=0; i<a.length; ++i) {
-        for(var j=i+1; j<a.length; ++j) {
-            if(a[i] === a[j])
-                a.splice(j--, 1);
+    var newArray = array.concat();
+    for(var i=0; i<newArray.length; ++i) {
+        for(var j=i+1; j<newArray.length; ++j) {
+            if(newArray[i] === newArray[j])
+                newArray.splice(j--, 1);
         }
     }
 
-    return a;
+    return newArray;
 };
+
 let url = require('url');
 
 exports.fullUrl=function fullUrl(req,path) {
@@ -84,4 +93,20 @@ exports.defaulter = function defaulter(value,returnValue,defaultValue) {
         return defaultValue;
     }
     return returnValue;
+}
+
+/** 
+ * @function isuserinarray
+ * Check if id in array or not
+ * @param {Array} array - array to search in
+ * @param {Number} userid - id that check for
+ * @returns {Boolean} flag 
+ */
+exports.isuserinarray = function isuserinarray(array,userid){
+    let flag= false
+    // get if user liked this video or not
+    if (array.toString().includes(String(userid))) {
+        flag = true;
+    }
+    return flag
 }

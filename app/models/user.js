@@ -85,7 +85,7 @@ UserSchema.pre('remove', function (next) {
     helpers.removeFile(this.image);
     this.model('Notification').remove({to: this._id}, (err) => {
         if (err) return next(err);
-        next();
+         next();
     });
 
 });
