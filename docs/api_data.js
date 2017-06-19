@@ -317,5 +317,228 @@ define({ "api": [
         ]
       }
     }
+  },
+  {
+    "type": "get",
+    "url": "/videos",
+    "title": "Request videos information",
+    "name": "GetVideos",
+    "group": "Video",
+    "error": {
+      "fields": {
+        "404": [
+          {
+            "group": "404",
+            "optional": false,
+            "field": "RetrivingUserError",
+            "description": "<p>Error while retriving data.</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "docs",
+            "description": "<p>List of videos.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "docs.name",
+            "description": "<p>Video name.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "docs.description",
+            "description": "<p>Video Description.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "docs.category",
+            "description": "<p>Video category id.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "docs.filename",
+            "description": "<p>Video filename.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "docs.views",
+            "description": "<p>Number of view video.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "docs.owner",
+            "description": "<p>Video owner id.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String[]",
+            "optional": false,
+            "field": "docs.tags",
+            "description": "<p>Tags name array.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "docs.comments",
+            "description": "<p>Video comments</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "docs.comments.comment",
+            "description": "<p>Comment body.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "docs.comments.owner",
+            "description": "<p>Comment owner.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String[]",
+            "optional": false,
+            "field": "docs.dislikes",
+            "description": "<p>Array of dislike <code>usersId</code></p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String[]",
+            "optional": false,
+            "field": "docs.likes",
+            "description": "<p>Array of likes <code>usersId</code></p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "docs.path",
+            "description": "<p>Video path</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "docs.stream",
+            "description": "<p>Video stream</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "docs.thumb",
+            "description": "<p>Video thumb</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "docs.liked",
+            "description": "<p>flag for loggin user liked video</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "docs.disliked",
+            "description": "<p>flag for loggin user disliked video</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "app/controllers/video.js",
+    "groupTitle": "Video"
+  },
+  {
+    "type": "post",
+    "url": "/videos",
+    "title": "Create a new Video",
+    "name": "PostVideo",
+    "group": "Video",
+    "version": "0.0.0",
+    "filename": "app/controllers/video.js",
+    "groupTitle": "Video",
+    "error": {
+      "fields": {
+        "422": [
+          {
+            "group": "422",
+            "optional": false,
+            "field": "nameRequired",
+            "description": "<p>Name is Required.</p>"
+          },
+          {
+            "group": "422",
+            "optional": false,
+            "field": "descriptionRequired",
+            "description": "<p>Descriptionis Required.</p>"
+          },
+          {
+            "group": "422",
+            "optional": false,
+            "field": "categoryRequired",
+            "description": "<p>Category is Required.</p>"
+          }
+        ],
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "NoAccessRight",
+            "description": "<p>Only authenticated.</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "return",
+            "description": "<p>Object is without name.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "return.success",
+            "description": "<p>success flag of success data insertion.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "return.message",
+            "description": "<p>success message.</p>"
+          }
+        ]
+      }
+    }
   }
 ] });
