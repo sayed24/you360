@@ -102,10 +102,12 @@ router.route('/:userId')
     .put((req, res, next) => {
         let userdata = req.body;
 
-        if (userdata.image) {
+        if (userdata.image && userdata.image.startsWith("data:")) {
             userdata.image = helpers.saveFile(userdata.image);
         }
+
         User.update({_id: req.params.userId}, {"$set": userdata}, (err) => {
+
             if (err) {
                 return res.status(422).json({success: false, message: err})
             }
