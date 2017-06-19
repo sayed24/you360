@@ -410,7 +410,7 @@
   },
   {
     "type": "delete",
-    "url": "/api/categories/categoryId",
+    "url": "/api/categories/:categoryId",
     "title": "Delete Category.",
     "name": "DeleteCategory",
     "group": "Category",
@@ -480,7 +480,7 @@
   },
   {
     "type": "get",
-    "url": "/api/categories/categoryId",
+    "url": "/api/categories/:categoryId",
     "title": "Request Category information",
     "name": "GetCategory",
     "group": "Category",
@@ -525,7 +525,7 @@
             "type": "Object",
             "optional": false,
             "field": "docs",
-            "description": "<p>List of all categories.</p>"
+            "description": "<p>category information.</p>"
           },
           {
             "group": "Success 200",
@@ -810,7 +810,7 @@
   },
   {
     "type": "put",
-    "url": "/api/categories/categoryId",
+    "url": "/api/categories/:categoryId",
     "title": "Delete Category.",
     "name": "PutCategory",
     "group": "Category",
@@ -850,6 +850,242 @@
     "version": "0.0.0",
     "filename": "app/controllers/category.js",
     "groupTitle": "Category",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "return",
+            "description": "<p>Object is without name.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "return.success",
+            "description": "<p>success flag of success data insertion.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "return.message",
+            "description": "<p>success message.</p>"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "get",
+    "url": "/api/reports/:reportId",
+    "title": "Request Report information",
+    "name": "GetReport",
+    "group": "Report",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "reportId",
+            "description": "<p>The Report-ID.</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "404": [
+          {
+            "group": "404",
+            "optional": false,
+            "field": "ReportNotfound",
+            "description": "<p>Error The <code>reportId</code> of the Report was not found.</p>"
+          }
+        ],
+        "422": [
+          {
+            "group": "422",
+            "optional": false,
+            "field": "RetrivingdataError",
+            "description": "<p>Error while retriving data.</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "report",
+            "description": "<p>report object.</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "app/controllers/report.js",
+    "groupTitle": "Report"
+  },
+  {
+    "type": "get",
+    "url": "/api/reports",
+    "title": "Retrive Reports data",
+    "name": "Getreports",
+    "group": "Report",
+    "error": {
+      "fields": {
+        "422": [
+          {
+            "group": "422",
+            "optional": false,
+            "field": "RetrivingCategoryError",
+            "description": "<p>Error while retriving data.</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "reports",
+            "description": "<p>list of reports.</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "app/controllers/report.js",
+    "groupTitle": "Report"
+  },
+  {
+    "type": "post",
+    "url": "/api/reports/:reportId/approve",
+    "title": "Request Report information",
+    "name": "PostApprove",
+    "group": "Report",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "reportId",
+            "description": "<p>The Report-ID.</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "404": [
+          {
+            "group": "404",
+            "optional": false,
+            "field": "ReportNotfound",
+            "description": "<p>Error The <code>reportId</code> of the Report was not found.</p>"
+          }
+        ],
+        "422": [
+          {
+            "group": "422",
+            "optional": false,
+            "field": "RetrivingdataError",
+            "description": "<p>Error while retriving data.</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "return",
+            "description": "<p>Object is without name.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "return.success",
+            "description": "<p>success flag of success data insertion.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "return.message",
+            "description": "<p>success message.</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "app/controllers/report.js",
+    "groupTitle": "Report"
+  },
+  {
+    "type": "post",
+    "url": "/api/reports",
+    "title": "Create a new Report",
+    "name": "Postreport",
+    "group": "Report",
+    "version": "0.0.0",
+    "filename": "app/controllers/report.js",
+    "groupTitle": "Report",
+    "error": {
+      "fields": {
+        "422": [
+          {
+            "group": "422",
+            "optional": false,
+            "field": "videoRequired",
+            "description": "<p>video is Required.</p>"
+          },
+          {
+            "group": "422",
+            "optional": false,
+            "field": "emailRequired",
+            "description": "<p>email is Required.</p>"
+          },
+          {
+            "group": "422",
+            "optional": false,
+            "field": "nameRequired",
+            "description": "<p>Name is Required.</p>"
+          },
+          {
+            "group": "422",
+            "optional": false,
+            "field": "descriptionRequired",
+            "description": "<p>description is Required.</p>"
+          }
+        ],
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "NoAccessRight",
+            "description": "<p>Only authenticated.</p>"
+          }
+        ]
+      }
+    },
     "success": {
       "fields": {
         "Success 200": [

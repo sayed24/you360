@@ -91,7 +91,7 @@ router.route('/:categoryId')
 
     ////Retrive category data
     /**
-     * @api {get} /api/categories/categoryId Request Category information
+     * @api {get} /api/categories/:categoryId Request Category information
      * @apiName GetCategory
      * @apiGroup Category
      *
@@ -100,7 +100,7 @@ router.route('/:categoryId')
      * @apiError (422) RetrivingCategoryError Error while retriving data.
      * @apiError (404) CategoryNotfound Error The <code>categoryId</code>  of the Category was not found.
      *
-     * @apiSuccess {Object} docs List of all categories.
+     * @apiSuccess {Object} docs category information.
      * @apiSuccess {String} docs.name category name.
      * @apiSuccess {String} docs.description category Description.
      */
@@ -122,7 +122,7 @@ router.route('/:categoryId')
 
     //Delete category 
     /**
-     * @api {delete} /api/categories/categoryId Delete Category.
+     * @api {delete} /api/categories/:categoryId Delete Category.
      * @apiName DeleteCategory
      * @apiGroup Category
      *
@@ -152,7 +152,7 @@ router.route('/:categoryId')
     })
     //Update category info
     /**
-     * @api {put} /api/categories/categoryId Delete Category.
+     * @api {put} /api/categories/:categoryId Delete Category.
      * @apiName PutCategory
      * @apiGroup Category
      *
