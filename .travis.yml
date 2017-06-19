@@ -32,8 +32,7 @@ after_success:
 - docker rmi $REPO:$COMMIT
 - docker images
 - docker push $REPO
-- ansible-playbook you360-ansible/you360_playbook.yml -i you360-ansible/hosts -b --extra-vars
-  "TNO=$TRAVIS_BRANCH" -vvvv --flush-cache
+
 deploy:
   skip_cleanup: true
   provider: releases
@@ -44,3 +43,6 @@ deploy:
   on:
     repo: sayed24/you360
     tags: true
+after_deploy:
+  - ansible-playbook you360-ansible/you360_playbook.yml -i you360-ansible/hosts -b --extra-vars
+    "TNO=$TRAVIS_BRANCH" -vvvv --flush-cache

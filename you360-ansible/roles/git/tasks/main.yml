@@ -5,11 +5,11 @@
     update_cache: yes
     name: git
     state: present
-- name: Creates directory
-  file: path=/home/salama/fromTravis-{{ TNO }} state=directory
-
-- name: var debug
-  debug:
-    msg: "{{ TNO }}"
-  tags:
-    - test_var
+# - name: Creates directory
+#   file: path=/home/salama/fromTravis-{{ TNO }} state=directory
+#
+# - name: var debug
+#   debug:
+#     msg: "{{ TNO }}"
+#   tags:
+#     - test_var
