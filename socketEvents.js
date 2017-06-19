@@ -107,7 +107,7 @@ exports = module.exports = function (io) {
         });
         //event for new comment added
         socket.on('new comment', (data) => {
-            mongoose.model('Video').findOne({_id: data.videoId}).populate('comments.owner').then((videos)=> {
+            mongoose.model('Video').findOne({_id: data.videoId}).populate('comments.owner').then((video)=> {
                 video.comments.push(data.comment);
                 video.save((err) => {
                     if (err) {
