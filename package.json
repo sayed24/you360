@@ -11,6 +11,7 @@
   "author": "Salama Ashoush",
   "license": "ISC",
   "dependencies": {
+    "apidoc": "^0.17.6",
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "^1.15.0",
     "compression": "^1.6.2",
@@ -49,5 +50,10 @@
     "nodemon": "^1.11.0",
     "should": "^11.1.1",
     "supertest": "^2.0.0"
+  },
+  "apidoc": {
+    "title": "apiDoc",
+    "url" : "https://you360.herokuapp.com",
+    "description": "API server for 360 video."
   }
 }

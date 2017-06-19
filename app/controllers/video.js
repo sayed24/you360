@@ -19,6 +19,7 @@ module.exports = function (app) {
 };
 
 
+
 var upload_video = multer({
     dest: "public/uploads",
     rename: function (fieldname, filename) {
@@ -65,6 +66,7 @@ router.get('/:videoId/stream', (req, res, next) => {
 
 router.use(requireAuth);
 
+
 router.post('/upload', function (req, res, next) {
     upload_video(req, res, function (err) {
         if (err) {
@@ -75,12 +77,55 @@ router.post('/upload', function (req, res, next) {
     });
 });
 
+/**
+ * @apiDefine CreateVideoError
+ *
+ * @apiError NoAccessRight Only authenticated.
+ * @apiError (422) nameRequired Name is Required.
+ * @apiError (422) descriptionRequired Descriptionis Required.
+ * @apiError (422) categoryRequired Category is Required.
+ */
+
+/**
+ * @apiDefine VideoSuccessReturn
+ * @apiSuccess {Object} return Object is without name. 
+ * @apiSuccess {Object} return.success success flag of success data insertion.
+ * @apiSuccess {String} return.message success message.
+ */
+
 
 /*
 * CRUD operations
 */
 router.route('/')
 //Retrive all videos
+    /**
+     * @api {get} /videos Request videos information
+     * @apiName GetVideos
+     * @apiGroup Video
+     *
+     * @apiError (404) RetrivingUserError Error while retriving data.
+     *
+     * @apiSuccess {Object[]} docs List of videos.
+     * @apiSuccess {String} docs.name Video name.
+     * @apiSuccess {String} docs.description Video Description.
+     * @apiSuccess {String} docs.category Video category id.
+     * @apiSuccess {String} docs.filename Video filename.
+     * @apiSuccess {Number} docs.views Number of view video.
+     * @apiSuccess {String} docs.owner Video owner id.
+     * @apiSuccess {String[]} docs.tags Tags name array.
+     * @apiSuccess {Object[]} docs.comments Video comments
+     * @apiSuccess {String} docs.comments.comment Comment body.
+     * @apiSuccess {String} docs.comments.owner Comment owner.
+     * @apiSuccess {String[]} docs.dislikes Array of dislike <code>usersId</code> 
+     * @apiSuccess {String[]} docs.likes Array of likes <code>usersId</code> 
+     * @apiSuccess {String} docs.path Video path
+     * @apiSuccess {String} docs.stream Video stream
+     * @apiSuccess {String} docs.thumb Video thumb
+     * @apiSuccess {Boolean} docs.liked flag for loggin user liked video 
+     * @apiSuccess {Boolean} docs.disliked flag for loggin user disliked video
+
+     */
     .get((req, res, next) => {
         Video.paginate({}, {
             populate: ["category", "owner", "comments.owner","copyrights"],
@@ -109,6 +154,15 @@ router.route('/')
             res.json(videos);
         })
     })
+    /**
+     * @api {post} /videos Create a new Video
+     * @apiName PostVideo
+     * @apiGroup Video
+     *
+     * @apiuse CreateVideoError
+     *
+     * @apiuse VideoSuccessReturn
+     */
     //Create New video  
     .post((req, res, next) => {
         req.checkBody({
