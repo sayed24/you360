@@ -19,6 +19,17 @@ module.exports = function (app) {
 };
 
 
+/**
+ * @api {post} /videos/:videoId/stream Striming Video
+ * @apiName PostStreamVideo
+ * @apiGroup Video
+ *
+ *
+ * @apiError (404) NotFoundError file not found.
+ *
+ * @apiSuccess (200) {Object} return Object is without name. 
+ * 
+ */
 
 var upload_video = multer({
     dest: "public/uploads",
@@ -66,6 +77,18 @@ router.get('/:videoId/stream', (req, res, next) => {
 
 router.use(requireAuth);
 
+/**
+ * @api {post} /videos/upload upload a new Video
+ * @apiName PostUploadVideo
+ * @apiGroup Video
+ *
+ *
+ * @apiError (400) UploadError any error durnig upload video.
+ *
+ * @apiSuccess {Object} return Object is without name. 
+ * @apiSuccess {Object} return.filename uploaded video name.
+ * 
+ */
 
 router.post('/upload', function (req, res, next) {
     upload_video(req, res, function (err) {

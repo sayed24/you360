@@ -753,6 +753,83 @@
   },
   {
     "type": "post",
+    "url": "/videos/:videoId/stream",
+    "title": "Striming Video",
+    "name": "PostStreamVideo",
+    "group": "Video",
+    "error": {
+      "fields": {
+        "404": [
+          {
+            "group": "404",
+            "optional": false,
+            "field": "NotFoundError",
+            "description": "<p>file not found.</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "200": [
+          {
+            "group": "200",
+            "type": "Object",
+            "optional": false,
+            "field": "return",
+            "description": "<p>Object is without name.</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "app/controllers/video.js",
+    "groupTitle": "Video"
+  },
+  {
+    "type": "post",
+    "url": "/videos/upload",
+    "title": "upload a new Video",
+    "name": "PostUploadVideo",
+    "group": "Video",
+    "error": {
+      "fields": {
+        "400": [
+          {
+            "group": "400",
+            "optional": false,
+            "field": "UploadError",
+            "description": "<p>any error durnig upload video.</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "return",
+            "description": "<p>Object is without name.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "return.filename",
+            "description": "<p>uploaded video name.</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "app/controllers/video.js",
+    "groupTitle": "Video"
+  },
+  {
+    "type": "post",
     "url": "/videos",
     "title": "Create a new Video",
     "name": "PostVideo",
