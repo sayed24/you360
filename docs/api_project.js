@@ -1,6 +1,6 @@
 define({
   "title": "apiDoc",
-  "url": "https://api.github.com/v1",
+  "url": "https://you360.herokuapp.com",
   "description": "API server for 360 video.",
   "name": "you360Server",
   "version": "1.0.0",
@@ -9,7 +9,7 @@ define({
   "apidoc": "0.3.0",
   "generator": {
     "name": "apidoc",
-    "time": "2017-06-19T15:48:30.274Z",
+    "time": "2017-06-19T16:32:42.741Z",
     "url": "http://apidocjs.com",
     "version": "0.17.6"
   }

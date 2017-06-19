@@ -123,12 +123,12 @@ router.route('/:userId')
      * @apiName GetUser
      * @apiGroup User
      *
-     * @apiParam {String} id The Users-ID.
+     * @apiParam {String} userId The Users-ID.
      * 
      * @apiError RetrivingUserError Error while retriving data.
      * @apiError UserNotFound   The <code>userId</code> of the User was not found.
      *
-     * @apiSuccess {String}   id            The Users-ID.
+     * @apiSuccess {Object}   user     The User information.
      */
     .get((req, res, next) => {
         let query = User.findOne({_id: req.params.userId});
@@ -151,7 +151,7 @@ router.route('/:userId')
      * @apiName PutUser
      * @apiGroup User
      *
-     * @apiParam {String} id The Users-ID.
+     * @apiParam {String} userId The Users-ID.
      * 
      * @apiError ModifingUserError Error while retriving data.
      * @apiError UserNotFound   The <code>userId</code> of the User was not found.
@@ -178,7 +178,7 @@ router.route('/:userId')
      * @apiName DeleteUser
      * @apiGroup User
      *
-     * @apiParam {String} id The Users-ID.
+     * @apiParam {String} userId The Users-ID.
      * 
      * 
      * @apiError UserNotFound   The <code>userId</code> of the User was not found.
@@ -223,7 +223,7 @@ router.get('/:userId/notifications', (req, res, next) => {
  *
  * @apiError RetrivingVideosError Error while retriving data.
  *
- * @apiParam {Number} id Users unique ID.
+ * @apiParam {Number} userId Users unique ID.
  *
  * @apiSuccess {Array} videos Array of user Videos
  */

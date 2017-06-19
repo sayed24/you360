@@ -12,7 +12,7 @@ define({ "api": [
             "group": "Parameter",
             "type": "String",
             "optional": false,
-            "field": "id",
+            "field": "userId",
             "description": "<p>The Users-ID.</p>"
           }
         ]
@@ -67,7 +67,7 @@ define({ "api": [
             "group": "Parameter",
             "type": "String",
             "optional": false,
-            "field": "id",
+            "field": "userId",
             "description": "<p>The Users-ID.</p>"
           }
         ]
@@ -96,10 +96,10 @@ define({ "api": [
         "Success 200": [
           {
             "group": "Success 200",
-            "type": "String",
+            "type": "Object",
             "optional": false,
-            "field": "id",
-            "description": "<p>The Users-ID.</p>"
+            "field": "user",
+            "description": "<p>The User information.</p>"
           }
         ]
       }
@@ -133,7 +133,7 @@ define({ "api": [
             "group": "Parameter",
             "type": "Number",
             "optional": false,
-            "field": "id",
+            "field": "userId",
             "description": "<p>Users unique ID.</p>"
           }
         ]
@@ -270,7 +270,7 @@ define({ "api": [
             "group": "Parameter",
             "type": "String",
             "optional": false,
-            "field": "id",
+            "field": "userId",
             "description": "<p>The Users-ID.</p>"
           }
         ]

@@ -19,6 +19,7 @@ module.exports = function (app) {
 };
 
 
+
 var upload_video = multer({
     dest: "public/uploads",
     rename: function (fieldname, filename) {
@@ -67,6 +68,7 @@ router.get('/:videoId/stream', (req, res, next) => {
 
 router.use(requireAuth);
 
+
 router.post('/upload', function (req, res, next) {
     upload_video(req, res, function (err) {
         if (err) {
@@ -77,6 +79,14 @@ router.post('/upload', function (req, res, next) {
     });
 });
 
+/**
+ * @apiDefine CreateVideoError
+ *
+ * @apiError NoAccessRight Only authenticated.
+ * @apiError nameRequired Name is Required.
+ * @apiError descriptionRequired Descriptionis Required.
+ * @apiError categoryRequired Category is Required.
+ */
 
 /*
 * CRUD operations
