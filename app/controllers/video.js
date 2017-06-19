@@ -515,7 +515,7 @@ router.post('/:videoId/dislike', (req, res, next) => {
 });
 
 /**
- * @api {post} /videos/:videoId/vide add views video record. 
+ * @api {post} /videos/:videoId/video add views video record. 
  * @apiName PostViews
  * @apiGroup Video
  *
@@ -541,6 +541,35 @@ router.post('/:videoId/view', (req, res, next) => {
         })
     });
 });
+
+/**
+ * @api {get} /videos/:videoId/similar Retrive similar videos. 
+ * @apiName PostsimilarVideos
+ * @apiGroup Video
+ *
+ * @apiError (422) RetrivingVideoError Error while retriving data.
+ * @apiError (404) VideoNotfound Error Video Not found.
+ *
+ * @apiSuccess {Object[]}  docs Video information
+ * @apiSuccess {String} docs.name Video name.
+ * @apiSuccess {String} docs.description Video Description.
+ * @apiSuccess {String} docs.category Video category id.
+ * @apiSuccess {String} docs.filename Video filename.
+ * @apiSuccess {Number} docs.views Number of view video.
+ * @apiSuccess {String} docs.owner Video owner id.
+ * @apiSuccess {String[]} docs.tags Tags name array.
+ * @apiSuccess {Object[]} docs.comments Video comments
+ * @apiSuccess {String} docs.comments.comment Comment body.
+ * @apiSuccess {String} docs.comments.owner Comment owner.
+ * @apiSuccess {String[]} docs.dislikes Array of dislike <code>usersId</code> 
+ * @apiSuccess {String[]} docs.likes Array of likes <code>usersId</code> 
+ * @apiSuccess {String} docs.path Video path
+ * @apiSuccess {String} docs.stream Video stream
+ * @apiSuccess {String} docs.thumb Video thumb
+ * @apiSuccess {Boolean} docs.liked flag for loggin user liked video 
+ * @apiSuccess {Boolean} docs.disliked flag for loggin user disliked video
+
+ */
 
 router.get('/:videoId/similar', (req, res, next) => {
     Video.findOne({_id: req.params.videoId}, (err, video) => {
