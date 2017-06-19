@@ -1115,10 +1115,10 @@ define({ "api": [
     }
   },
   {
-    "type": "get",
+    "type": "post",
     "url": "/api/search",
     "title": "full text search in videos",
-    "name": "GetSearch",
+    "name": "PostSearch",
     "group": "Search",
     "error": {
       "fields": {

@@ -152,7 +152,7 @@ router.route('/:categoryId')
     })
     //Update category info
     /**
-     * @api {put} /api/categories/:categoryId Delete Category.
+     * @api {put} /api/categories/:categoryId Edit Category.
      * @apiName PutCategory
      * @apiGroup Category
      *
