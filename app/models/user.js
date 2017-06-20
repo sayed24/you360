@@ -80,6 +80,7 @@ UserSchema.pre('save', function (next) {
         });
     });
 });
+
 UserSchema.pre('remove', function (next) {
     // Remove all related docs
     helpers.removeFile(this.image);
@@ -89,6 +90,7 @@ UserSchema.pre('remove', function (next) {
     });
 
 });
+
 // Method to compare password for login
 UserSchema.methods.comparePassword = function (candidatePassword, cb) {
     bcrypt.compare(candidatePassword, this.password, (err, isMatch) => {

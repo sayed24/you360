@@ -17,7 +17,7 @@ module.exports = function (app, config) {
     // app.set('view engine', 'ejs');
     // Enable CORS from client-side
     app.use(cors());
-    // app.options('*', cors())
+    app.options('*', cors())
     app.use(express.static(config.root + '/public'));
     app.use(cookieParser());
     app.use(bodyParser.json({limit: '50mb'}));
