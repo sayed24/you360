@@ -44,7 +44,7 @@ router.use(requireAuth);
 
 router.route('/')
     /**
-     * @api {get} /users Request Users information
+     * @api {get} /api/users Request Users information
      * @apiName GetUsers
      * @apiGroup User
      *
@@ -65,7 +65,7 @@ router.route('/')
 
     })
     /**
-     * @api {post} /users Create a new User
+     * @api {post} /api/users Create a new User
      * @apiName PostUser
      * @apiGroup User
      *
@@ -120,7 +120,7 @@ router.route('/')
 
 router.route('/:userId')
     /**
-     * @api {get} /users/:userId Read data of a User
+     * @api {get} /api/users/:userId Read data of a User
      * @apiName GetUser
      * @apiGroup User
      *
@@ -148,7 +148,7 @@ router.route('/:userId')
 
     })
     /**
-     * @api {put} /users/:userId Change User date.
+     * @api {put} /api/users/:userId Change User date.
      * @apiName PutUser
      * @apiGroup User
      *
@@ -176,7 +176,7 @@ router.route('/:userId')
         });
     })
     /**
-     * @api {delete} /users/:userId Delete User.
+     * @api {delete} /api/users/:userId Delete User.
      * @apiName DeleteUser
      * @apiGroup User
      *
@@ -219,7 +219,7 @@ router.get('/:userId/notifications', (req, res, next) => {
     })
 });
 /**
- * @api {get} /user/:userId/videos Request User videos information
+ * @api {get} /api/users/:userId/videos Request User videos information
  * @apiName GetUserVideos
  * @apiGroup User
  *

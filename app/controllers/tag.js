@@ -12,7 +12,15 @@ module.exports = function (app) {
 };
 
 router.use(requireAuth);
-
+/**
+ * @api {get} /api/tags Request all tags
+ * @apiName GetTags
+ * @apiGroup Tag
+ *
+ * @apiError (422) RetrivingTagError Error while retriving data.
+ *
+ * @apiSuccess {String[]} list of tags.
+ */
 router.route('/')
     .get((req, res, next) => {
         Video.find({}, {tags: 1, _id: 0}, function (err, tags) {
