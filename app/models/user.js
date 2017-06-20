@@ -80,15 +80,16 @@ UserSchema.pre('save', function (next) {
         });
     });
 });
-UserSchema.pre('remove', function (next) {
-    // Remove all related docs
-    helpers.removeFile(this.image);
-    this.model('Notification').remove({to: this._id}, (err) => {
-        if (err) return next(err);
-         next();
-    });
 
-});
+// UserSchema.pre('remove', function (next) {
+//     // Remove all related docs
+//     this.model('Notification').remove({to: this._id}, (err) => {
+//         if (err) return next(err);
+//          next();
+//     });
+//
+// });
+
 // Method to compare password for login
 UserSchema.methods.comparePassword = function (candidatePassword, cb) {
     bcrypt.compare(candidatePassword, this.password, (err, isMatch) => {

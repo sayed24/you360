@@ -307,6 +307,7 @@ router.route('/:videoId')
             if (!video) {
                 return res.status(404).json({success: false, message: "Video Not found"})
             }
+            helpers.removeFile(this.filename);
             video.remove((err) => {
                 if (err) {
                     return res.status(422).json({success: false, message: err.message})

@@ -2,6 +2,7 @@ const router = require('express').Router(),
     passport = require('passport'),
     fs = require('fs'),
     helpers = require('../helpers'),
+    bcrypt = require('bcrypt-nodejs'),
     config = require('../../config/config'),
     User = require('mongoose').model('User'),
     Video = require('mongoose').model('Video');
@@ -164,9 +165,13 @@ router.route('/:userId')
         if (userdata.image && userdata.image.startsWith("data:")) {
             userdata.image = helpers.saveFile(userdata.image);
         }
+        if(userdata.password){
+            let salt = bcrypt.genSaltSync(5);
+            userdata.password = bcrypt.hashSync(userdata.password, salt, null);
+            console.log(userdata.password);
+        }
 
         User.update({_id: req.params.userId}, {"$set": userdata}, (err) => {
-
             if (err) {
                 return res.status(422).json({success: false, message: err})
             }
@@ -193,6 +198,7 @@ router.route('/:userId')
             if (!user) {
                 return res.status(404).json({success: false, message: "User Not found"})
             }
+            // helpers.removeFile(this.image);
             user.remove((err) => {
                 if (err) {
                     return res.status(422).json({success: false, message: err.message})
