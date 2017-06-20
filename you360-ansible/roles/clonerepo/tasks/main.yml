@@ -48,7 +48,7 @@
     - check
 
 - name: "Start  Node.js app."
-  command: forever start -o out.log -e err.log -l logfile.log /home/salama/you360/app.js
+  command: forever start -ao out.log -ae err.log -al logfile.log -ad debug.log /home/salama/you360/app.js
   #when: "forever_list.stdout.find('/home/salama/you360/app.js') == -1"
   tags:
     - start
