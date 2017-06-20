@@ -198,6 +198,7 @@ router.route('/:userId')
             if (!user) {
                 return res.status(404).json({success: false, message: "User Not found"})
             }
+            // helpers.removeFile(this.image);
             user.remove((err) => {
                 if (err) {
                     return res.status(422).json({success: false, message: err.message})

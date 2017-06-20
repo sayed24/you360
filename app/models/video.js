@@ -65,11 +65,11 @@ const VideoSchema = new Schema({
 VideoSchema.index({'$**': 'text'});
 
 
-VideoSchema.pre('remove', function (next) {
-    // Remove all related docs
-    helpers.removeFile(this.image);
-    next();
-});
+// VideoSchema.pre('remove', function (next) {
+//     // Remove all related docs
+//     helpers.removeFile(this.image);
+//     next();
+// });
 
 //= ===============================
 // User ORM Virtuals
