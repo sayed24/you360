@@ -166,7 +166,7 @@ router.route('/:userId')
             userdata.image = helpers.saveFile(userdata.image);
         }
         let salt = bcrypt.genSaltSync(5);
-        userdata.password = bcrypt.hashSync(userdata.password, salt, null,);
+        userdata.password = bcrypt.hashSync(userdata.password, salt, null);
         console.log(userdata.password);
         User.update({_id: req.params.userId}, {"$set": userdata}, (err) => {
             if (err) {
